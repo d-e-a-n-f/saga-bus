@@ -13,10 +13,11 @@
     "@saga-bus/core": "workspace:*",
     "@saga-bus/examples-shared": "workspace:*",
     "@saga-bus/nextjs": "workspace:*",
-    "@saga-bus/store-inmemory": "workspace:*",
-    "@saga-bus/transport-inmemory": "workspace:*",
+    "@saga-bus/store-postgres": "workspace:*",
+    "@saga-bus/transport-rabbitmq": "workspace:*",
     "@saga-bus/middleware-logging": "workspace:*",
     "next": "^14.2.0",
+    "pg": "^8.16.0",
     "react": "^18.3.0",
     "react-dom": "^18.3.0"
   },
@@ -24,6 +25,7 @@
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/node": "^20.0.0",
+    "@types/pg": "^8.11.6",
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
     "typescript": "^5.9.2"

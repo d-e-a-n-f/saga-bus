@@ -35,15 +35,18 @@ importers:
       '@saga-bus/nextjs':
         specifier: workspace:*
         version: link:../../packages/nextjs
-      '@saga-bus/store-inmemory':
+      '@saga-bus/store-postgres':
         specifier: workspace:*
-        version: link:../../packages/store-inmemory
-      '@saga-bus/transport-inmemory':
+        version: link:../../packages/store-postgres
+      '@saga-bus/transport-rabbitmq':
         specifier: workspace:*
-        version: link:../../packages/transport-inmemory
+        version: link:../../packages/transport-rabbitmq
       next:
         specifier: ^14.2.0
         version: 14.2.33(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      pg:
+        specifier: ^8.16.0
+        version: 8.16.3
       react:
         specifier: ^18.3.0
         version: 18.3.1
@@ -60,6 +63,9 @@ importers:
       '@types/node':
         specifier: ^20.0.0
         version: 20.19.26
+      '@types/pg':
+        specifier: ^8.11.6
+        version: 8.15.6
       '@types/react':
         specifier: ^18.3.0
         version: 18.3.27

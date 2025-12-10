@@ -1,15 +1,37 @@
+import { Pool } from "pg";
 import { createBus, type Bus } from "@saga-bus/core";
-import { InMemoryTransport } from "@saga-bus/transport-inmemory";
-import { InMemorySagaStore } from "@saga-bus/store-inmemory";
+import { RabbitMqTransport } from "@saga-bus/transport-rabbitmq";
+import { PostgresSagaStore } from "@saga-bus/store-postgres";
 import { createLoggingMiddleware } from "@saga-bus/middleware-logging";
 import {
   LoanApplicationSaga,
   type LoanApplicationSagaState,
 } from "@saga-bus/examples-shared";
 
-// Create singleton instances for the example
-const transport = new InMemoryTransport();
-const store = new InMemorySagaStore<LoanApplicationSagaState>();
+// Configuration from environment
+const POSTGRES_URL =
+  process.env.DATABASE_URL ?? "postgresql://saga:saga@localhost:5432/saga_bus";
+const RABBITMQ_URL = process.env.RABBITMQ_URL ?? "amqp://saga:saga@localhost:5672";
+const RABBITMQ_EXCHANGE = process.env.RABBITMQ_EXCHANGE ?? "saga-bus";
+
+// Create PostgreSQL pool
+const pool = new Pool({
+  connectionString: POSTGRES_URL,
+});
+
+// Create RabbitMQ transport
+const transport = new RabbitMqTransport({
+  uri: RABBITMQ_URL,
+  exchange: RABBITMQ_EXCHANGE,
+  exchangeType: "topic",
+  durable: true,
+});
+
+// Create PostgreSQL store
+const store = new PostgresSagaStore<LoanApplicationSagaState>({
+  pool,
+  tableName: "loan_saga_instances",
+});
 
 // Create logging middleware
 const loggingMiddleware = createLoggingMiddleware({
@@ -52,4 +74,8 @@ export function getStore() {
 
 export function getTransport() {
   return transport;
+}
+
+export function getPool() {
+  return pool;
 }

@@ -6,8 +6,10 @@ import { randomUUID } from "crypto";
 export async function GET() {
   const store = getStore();
 
-  // Get all loan applications from store
-  const allStates = store.getAll();
+  // Get all loan applications from store using PostgreSQL query
+  const allStates = await store.findByName("LoanApplicationSaga", {
+    limit: 100,
+  });
 
   const applications = allStates.map((state) => ({
     applicationId: state.applicationId,
