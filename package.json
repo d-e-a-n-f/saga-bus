@@ -1,6 +1,32 @@
 {
   "name": "saga-bus",
+  "description": "A MassTransit-style saga orchestration library for TypeScript/Node.js",
   "private": true,
+  "license": "MIT",
+  "author": "Dean Foran",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/d-e-a-n-f/saga-bus.git"
+  },
+  "homepage": "https://github.com/d-e-a-n-f/saga-bus#readme",
+  "bugs": {
+    "url": "https://github.com/d-e-a-n-f/saga-bus/issues"
+  },
+  "keywords": [
+    "saga",
+    "orchestration",
+    "state-machine",
+    "workflow",
+    "event-driven",
+    "microservices",
+    "message-bus",
+    "typescript",
+    "rabbitmq",
+    "kafka",
+    "sqs",
+    "redis",
+    "nats"
+  ],
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
