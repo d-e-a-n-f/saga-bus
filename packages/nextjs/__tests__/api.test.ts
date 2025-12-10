@@ -105,7 +105,7 @@ describe("createSagaHandler", () => {
         status: "pending",
       };
 
-      await store.insert("TestSaga", testState);
+      await store.insert("TestSaga", "saga-1", testState);
 
       const request = createMockRequest({
         action: "getState",

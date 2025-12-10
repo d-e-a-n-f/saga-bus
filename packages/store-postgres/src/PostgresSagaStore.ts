@@ -75,11 +75,8 @@ export class PostgresSagaStore<TState extends SagaState>
     return this.rowToState(result.rows[0]!);
   }
 
-  async insert(sagaName: string, state: TState): Promise<void> {
+  async insert(sagaName: string, correlationId: string, state: TState): Promise<void> {
     const { sagaId, version, isCompleted, createdAt, updatedAt } = state.metadata;
-
-    // Use sagaId as correlation_id if not specified elsewhere
-    const correlationId = (state as unknown as { correlationId?: string }).correlationId ?? sagaId;
 
     await this.pool.query(
       `INSERT INTO ${this.fullTableName}

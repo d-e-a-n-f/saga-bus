@@ -1,8 +1,14 @@
+// Initialize telemetry FIRST before any other imports
+import { initTelemetry, shutdownTelemetry } from "./telemetry.js";
+const telemetrySdk = initTelemetry();
+
 import { Pool } from "pg";
 import { createBus, type Bus } from "@saga-bus/core";
 import { RabbitMqTransport } from "@saga-bus/transport-rabbitmq";
 import { PostgresSagaStore } from "@saga-bus/store-postgres";
 import { createLoggingMiddleware } from "@saga-bus/middleware-logging";
+import { createMetricsMiddleware } from "@saga-bus/middleware-metrics";
+import { createTracingMiddleware } from "@saga-bus/middleware-tracing";
 import { OrderSaga, type OrderSagaState } from "@saga-bus/examples-shared";
 
 import { loadConfig } from "./config.js";
@@ -40,27 +46,7 @@ async function main(): Promise<void> {
   // Create store
   const store = new PostgresSagaStore<OrderSagaState>({ pool });
 
-  // Create logging middleware
-  const loggingMiddleware = createLoggingMiddleware({
-    level: "info",
-    logPayload: true,
-  });
-
-  // Create bus
-  const bus: Bus = createBus({
-    transport,
-    store,
-    sagas: [{ definition: OrderSaga }],
-    middleware: [loggingMiddleware],
-    logger: {
-      debug: (msg, meta) => console.debug(`[DEBUG] ${msg}`, meta ?? ""),
-      info: (msg, meta) => console.log(`[INFO] ${msg}`, meta ?? ""),
-      warn: (msg, meta) => console.warn(`[WARN] ${msg}`, meta ?? ""),
-      error: (msg, meta) => console.error(`[ERROR] ${msg}`, meta ?? ""),
-    },
-  });
-
-  // Create health server
+  // Create health server (before bus so we can use it in metrics middleware)
   const healthServer: HealthServer = createHealthServer(
     config.server.port,
     config.server.host,
@@ -72,6 +58,34 @@ async function main(): Promise<void> {
       },
     })
   );
+
+  // Create middleware
+  const loggingMiddleware = createLoggingMiddleware({
+    level: "info",
+    logPayload: true,
+  });
+
+  const tracingMiddleware = createTracingMiddleware({
+    tracerName: "saga-bus-worker",
+    recordPayload: true,
+    maxPayloadSize: 2048,
+  });
+
+  const metricsMiddleware = createMetricsMiddleware();
+
+  // Create bus
+  const bus: Bus = createBus({
+    transport,
+    store,
+    sagas: [{ definition: OrderSaga }],
+    middleware: [tracingMiddleware, metricsMiddleware, loggingMiddleware],
+    logger: {
+      debug: (msg, meta) => console.debug(`[DEBUG] ${msg}`, meta ?? ""),
+      info: (msg, meta) => console.log(`[INFO] ${msg}`, meta ?? ""),
+      warn: (msg, meta) => console.warn(`[WARN] ${msg}`, meta ?? ""),
+      error: (msg, meta) => console.error(`[ERROR] ${msg}`, meta ?? ""),
+    },
+  });
 
   // Graceful shutdown handling
   let isShuttingDown = false;
@@ -91,6 +105,9 @@ async function main(): Promise<void> {
 
       await pool.end();
       console.log("Database pool closed");
+
+      await shutdownTelemetry(telemetrySdk);
+      console.log("Telemetry shutdown");
 
       console.log("Shutdown complete");
       process.exit(0);

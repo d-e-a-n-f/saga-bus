@@ -82,12 +82,9 @@ export class DynamoDBSagaStore<TState extends SagaState>
     return this.itemToState(result.Items[0] as SagaInstanceItem);
   }
 
-  async insert(sagaName: string, state: TState): Promise<void> {
+  async insert(sagaName: string, correlationId: string, state: TState): Promise<void> {
     const { sagaId, version, isCompleted, createdAt, updatedAt } =
       state.metadata;
-
-    const correlationId =
-      (state as unknown as { correlationId?: string }).correlationId ?? sagaId;
 
     // Serialize state with dates converted to ISO strings for DynamoDB compatibility
     const serializedState = this.serializeState(state);

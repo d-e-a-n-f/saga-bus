@@ -93,7 +93,7 @@ describe("createSagaBus", () => {
       status: "pending",
     };
 
-    await store.insert("TestSaga", testState);
+    await store.insert("TestSaga", "saga-1", testState);
 
     const state = await bus.getState<TestState>("TestSaga", "saga-1");
     expect(state?.orderId).toBe("order-1");
@@ -122,7 +122,7 @@ describe("createSagaBus", () => {
       status: "pending",
     };
 
-    await store.insert("TestSaga", testState);
+    await store.insert("TestSaga", "saga-1", testState);
 
     // Note: InMemorySagaStore may not fully support correlation ID lookup
     // This test verifies the bus method exists and calls through to store
@@ -165,7 +165,7 @@ describe("getSagaState", () => {
       status: "pending",
     };
 
-    await store.insert("TestSaga", testState);
+    await store.insert("TestSaga", "saga-1", testState);
 
     const state = await getSagaState<TestState>(bus, "TestSaga", "saga-1");
     expect(state?.orderId).toBe("order-1");

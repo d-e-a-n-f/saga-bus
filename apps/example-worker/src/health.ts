@@ -1,11 +1,9 @@
 import Fastify from "fastify";
-import { Registry, collectDefaultMetrics, Counter, Histogram } from "prom-client";
+import { collectDefaultMetrics, register } from "prom-client";
 
 export interface HealthServer {
   start(): Promise<void>;
   stop(): Promise<void>;
-  incrementMessagesProcessed(messageType: string): void;
-  recordProcessingDuration(messageType: string, durationMs: number): void;
 }
 
 export function createHealthServer(
@@ -14,26 +12,9 @@ export function createHealthServer(
   checkHealth: () => Promise<{ status: string; checks: Record<string, boolean> }>
 ): HealthServer {
   const fastify = Fastify({ logger: false });
-  const register = new Registry();
 
-  // Collect default Node.js metrics
-  collectDefaultMetrics({ register });
-
-  // Custom metrics
-  const messagesProcessed = new Counter({
-    name: "saga_bus_messages_processed_total",
-    help: "Total messages processed by type",
-    labelNames: ["message_type"],
-    registers: [register],
-  });
-
-  const processingDuration = new Histogram({
-    name: "saga_bus_message_processing_duration_ms",
-    help: "Message processing duration in milliseconds",
-    labelNames: ["message_type"],
-    buckets: [1, 5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000],
-    registers: [register],
-  });
+  // Collect default Node.js metrics (uses global registry)
+  collectDefaultMetrics();
 
   // Health endpoint
   fastify.get("/health", async () => {
@@ -54,7 +35,7 @@ export function createHealthServer(
     return health;
   });
 
-  // Metrics endpoint for Prometheus
+  // Metrics endpoint for Prometheus (uses global registry which includes saga-bus metrics)
   fastify.get("/metrics", async (request, reply) => {
     reply.header("Content-Type", register.contentType);
     return register.metrics();
@@ -67,12 +48,6 @@ export function createHealthServer(
     },
     async stop() {
       await fastify.close();
-    },
-    incrementMessagesProcessed(messageType: string) {
-      messagesProcessed.inc({ message_type: messageType });
-    },
-    recordProcessingDuration(messageType: string, durationMs: number) {
-      processingDuration.observe({ message_type: messageType }, durationMs);
     },
   };
 }

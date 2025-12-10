@@ -78,12 +78,9 @@ export class MongoSagaStore<TState extends SagaState>
     return this.documentToState(doc);
   }
 
-  async insert(sagaName: string, state: TState): Promise<void> {
+  async insert(sagaName: string, correlationId: string, state: TState): Promise<void> {
     const { sagaId, version, isCompleted, createdAt, updatedAt } =
       state.metadata;
-
-    const correlationId =
-      (state as unknown as { correlationId?: string }).correlationId ?? sagaId;
 
     const doc: SagaInstanceDocument = {
       _id: this.makeId(sagaName, sagaId),

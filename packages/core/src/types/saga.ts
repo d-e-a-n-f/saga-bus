@@ -17,6 +17,10 @@ export interface SagaStateMetadata {
   readonly isCompleted: boolean;
   /** When the saga was archived (if applicable) */
   readonly archivedAt?: Date | null;
+  /** W3C traceparent header for distributed tracing correlation */
+  readonly traceParent?: string | null;
+  /** W3C tracestate header for distributed tracing */
+  readonly traceState?: string | null;
 }
 
 /**
@@ -48,7 +52,7 @@ export interface SagaStore<TState extends SagaState> {
    * Insert a new saga instance.
    * @throws if a saga with the same ID already exists
    */
-  insert(sagaName: string, state: TState): Promise<void>;
+  insert(sagaName: string, correlationId: string, state: TState): Promise<void>;
 
   /**
    * Update an existing saga instance with optimistic concurrency.

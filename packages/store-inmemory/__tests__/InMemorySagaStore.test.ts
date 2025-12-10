@@ -41,7 +41,7 @@ describe("InMemorySagaStore", () => {
     it("should insert a new saga", async () => {
       const state = createTestState("saga-1");
 
-      await store.insert(sagaName, state);
+      await store.insert(sagaName, "corr-1", state);
 
       expect(store.size).toBe(1);
       expect(store.has(sagaName, "saga-1")).toBe(true);
@@ -50,9 +50,9 @@ describe("InMemorySagaStore", () => {
     it("should throw when inserting duplicate saga", async () => {
       const state = createTestState("saga-1");
 
-      await store.insert(sagaName, state);
+      await store.insert(sagaName, "corr-1", state);
 
-      await expect(store.insert(sagaName, state)).rejects.toThrow(
+      await expect(store.insert(sagaName, "corr-2", state)).rejects.toThrow(
         "already exists"
       );
     });
@@ -60,7 +60,7 @@ describe("InMemorySagaStore", () => {
     it("should clone state to prevent external mutation", async () => {
       const state = createTestState("saga-1", { items: ["item1"] });
 
-      await store.insert(sagaName, state);
+      await store.insert(sagaName, "corr-1", state);
 
       // Mutate original
       state.items.push("item2");
@@ -74,7 +74,7 @@ describe("InMemorySagaStore", () => {
   describe("getById", () => {
     it("should retrieve an existing saga", async () => {
       const state = createTestState("saga-1", { status: "active" });
-      await store.insert(sagaName, state);
+      await store.insert(sagaName, "corr-1", state);
 
       const retrieved = await store.getById(sagaName, "saga-1");
 
@@ -91,7 +91,7 @@ describe("InMemorySagaStore", () => {
 
     it("should return cloned state", async () => {
       const state = createTestState("saga-1", { items: ["item1"] });
-      await store.insert(sagaName, state);
+      await store.insert(sagaName, "corr-1", state);
 
       const retrieved = await store.getById(sagaName, "saga-1");
       retrieved?.items.push("mutated");
@@ -105,8 +105,7 @@ describe("InMemorySagaStore", () => {
   describe("getByCorrelationId", () => {
     it("should retrieve saga by correlation ID", async () => {
       const state = createTestState("saga-1");
-      await store.insert(sagaName, state);
-      store.indexByCorrelationId(sagaName, "order-123", "saga-1");
+      await store.insert(sagaName, "order-123", state);
 
       const retrieved = await store.getByCorrelationId(sagaName, "order-123");
 
@@ -116,8 +115,8 @@ describe("InMemorySagaStore", () => {
 
     it("should return null for non-indexed correlation", async () => {
       const state = createTestState("saga-1");
-      await store.insert(sagaName, state);
-      // Don't index it
+      await store.insert(sagaName, "other-corr", state);
+      // Insert with different correlation
 
       const retrieved = await store.getByCorrelationId(sagaName, "order-123");
 
@@ -128,7 +127,7 @@ describe("InMemorySagaStore", () => {
   describe("update", () => {
     it("should update an existing saga", async () => {
       const state = createTestState("saga-1");
-      await store.insert(sagaName, state);
+      await store.insert(sagaName, "corr-1", state);
 
       const updated: TestState = {
         ...state,
@@ -149,7 +148,7 @@ describe("InMemorySagaStore", () => {
 
     it("should throw ConcurrencyError on version mismatch", async () => {
       const state = createTestState("saga-1");
-      await store.insert(sagaName, state);
+      await store.insert(sagaName, "corr-1", state);
 
       const updated: TestState = {
         ...state,
@@ -165,7 +164,7 @@ describe("InMemorySagaStore", () => {
 
     it("should include version info in ConcurrencyError", async () => {
       const state = createTestState("saga-1");
-      await store.insert(sagaName, state);
+      await store.insert(sagaName, "corr-1", state);
 
       const updated: TestState = {
         ...state,
@@ -194,7 +193,7 @@ describe("InMemorySagaStore", () => {
 
     it("should validate version increment", async () => {
       const state = createTestState("saga-1");
-      await store.insert(sagaName, state);
+      await store.insert(sagaName, "corr-1", state);
 
       const updated: TestState = {
         ...state,
@@ -210,7 +209,7 @@ describe("InMemorySagaStore", () => {
   describe("delete", () => {
     it("should delete an existing saga", async () => {
       const state = createTestState("saga-1");
-      await store.insert(sagaName, state);
+      await store.insert(sagaName, "corr-1", state);
 
       await store.delete(sagaName, "saga-1");
 
@@ -230,8 +229,8 @@ describe("InMemorySagaStore", () => {
       const state1 = createTestState("saga-1", { status: "order" });
       const state2 = createTestState("saga-1", { status: "payment" });
 
-      await store.insert("OrderSaga", state1);
-      await store.insert("PaymentSaga", state2);
+      await store.insert("OrderSaga", "corr-1", state1);
+      await store.insert("PaymentSaga", "corr-1", state2);
 
       const order = await store.getById("OrderSaga", "saga-1");
       const payment = await store.getById("PaymentSaga", "saga-1");
@@ -244,9 +243,8 @@ describe("InMemorySagaStore", () => {
 
   describe("utility methods", () => {
     it("should clear all data", async () => {
-      await store.insert(sagaName, createTestState("saga-1"));
-      await store.insert(sagaName, createTestState("saga-2"));
-      store.indexByCorrelationId(sagaName, "corr-1", "saga-1");
+      await store.insert(sagaName, "corr-1", createTestState("saga-1"));
+      await store.insert(sagaName, "corr-2", createTestState("saga-2"));
 
       store.clear();
 
@@ -255,8 +253,8 @@ describe("InMemorySagaStore", () => {
     });
 
     it("should return all stored states", async () => {
-      await store.insert(sagaName, createTestState("saga-1"));
-      await store.insert(sagaName, createTestState("saga-2"));
+      await store.insert(sagaName, "corr-1", createTestState("saga-1"));
+      await store.insert(sagaName, "corr-2", createTestState("saga-2"));
 
       const all = store.getAll();
 

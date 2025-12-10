@@ -61,13 +61,9 @@ export class PrismaSagaStore<TState extends SagaState>
     return this.recordToState(record);
   }
 
-  async insert(sagaName: string, state: TState): Promise<void> {
+  async insert(sagaName: string, correlationId: string, state: TState): Promise<void> {
     const { sagaId, version, isCompleted, createdAt, updatedAt } =
       state.metadata;
-
-    // Extract correlation ID from state if available
-    const correlationId =
-      (state as unknown as { correlationId?: string }).correlationId ?? sagaId;
 
     await this.prisma.sagaInstance.create({
       data: {

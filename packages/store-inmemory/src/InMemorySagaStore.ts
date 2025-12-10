@@ -48,7 +48,7 @@ export class InMemorySagaStore<TState extends SagaState>
     return this.getById(sagaName, sagaId);
   }
 
-  async insert(sagaName: string, state: TState): Promise<void> {
+  async insert(sagaName: string, correlationId: string, state: TState): Promise<void> {
     const { sagaId } = state.metadata;
     const storeKey = this.getStoreKey(sagaName, sagaId);
 
@@ -58,17 +58,8 @@ export class InMemorySagaStore<TState extends SagaState>
 
     // Store the state (deep clone to prevent mutation)
     this.store.set(storeKey, this.clone(state));
-  }
 
-  /**
-   * Index a saga by correlation ID.
-   * Called separately from insert to allow custom correlation handling.
-   */
-  indexByCorrelationId(
-    sagaName: string,
-    correlationId: string,
-    sagaId: string
-  ): void {
+    // Index by correlation ID
     const correlationKey = this.getCorrelationKey(sagaName, correlationId);
     this.correlationIndex.set(correlationKey, sagaId);
   }

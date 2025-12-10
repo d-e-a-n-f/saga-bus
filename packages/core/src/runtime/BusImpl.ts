@@ -130,6 +130,7 @@ export class BusImpl implements Bus {
                   correlationId: "",
                   metadata: {},
                   error,
+                  setTraceContext: () => {}, // No-op for error context
                 });
 
                 if (action === "retry") {

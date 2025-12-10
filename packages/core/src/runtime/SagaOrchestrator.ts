@@ -62,17 +62,31 @@ export class SagaOrchestrator<
       return;
     }
 
-    // Create pipeline context
+    // Load existing saga state BEFORE pipeline executes
+    // This allows middleware (e.g., tracing) to access stored trace context
+    const existingState = await this.store.getByCorrelationId(
+      this.definition.name,
+      correlationId
+    );
+
+    // Create pipeline context with mutable trace context
+    let traceContext: { traceParent: string; traceState: string | null } | undefined;
+
     const pipelineCtx: SagaPipelineContext = {
       envelope,
       sagaName: this.definition.name,
       correlationId,
+      existingState, // Provide existing state to middleware
       metadata: {},
+      setTraceContext(traceParent: string, traceState: string | null) {
+        traceContext = { traceParent, traceState };
+        pipelineCtx.traceContext = traceContext;
+      },
     };
 
     try {
       await this.pipeline.execute(pipelineCtx, async () => {
-        await this.handleMessage(envelope, correlationId, correlation.canStart, pipelineCtx);
+        await this.handleMessage(envelope, correlationId, correlation.canStart, existingState, pipelineCtx);
       });
     } catch (error) {
       pipelineCtx.error = error;
@@ -84,15 +98,13 @@ export class SagaOrchestrator<
     envelope: MessageEnvelope<TMessages>,
     correlationId: string,
     canStart: boolean,
+    existingState: TState | null,
     pipelineCtx: SagaPipelineContext
   ): Promise<void> {
     const message = envelope.payload;
 
-    // Try to load existing saga
-    let state = await this.store.getByCorrelationId(
-      this.definition.name,
-      correlationId
-    );
+    // Use the pre-loaded existing state
+    let state = existingState;
 
     let sagaId: string;
 
@@ -120,7 +132,7 @@ export class SagaOrchestrator<
 
       state = await this.definition.createInitialState(message, ctx);
 
-      // Ensure metadata is set correctly
+      // Ensure metadata is set correctly, including trace context if set by middleware
       state = {
         ...state,
         metadata: {
@@ -130,17 +142,13 @@ export class SagaOrchestrator<
           createdAt: now(),
           updatedAt: now(),
           isCompleted: false,
+          traceParent: pipelineCtx.traceContext?.traceParent ?? null,
+          traceState: pipelineCtx.traceContext?.traceState ?? null,
         },
       };
 
       // Insert the new saga
-      await this.store.insert(this.definition.name, state);
-
-      // Index by correlation ID (if store supports it)
-      if ("indexByCorrelationId" in this.store) {
-        (this.store as { indexByCorrelationId: (name: string, corrId: string, id: string) => void })
-          .indexByCorrelationId(this.definition.name, correlationId, sagaId);
-      }
+      await this.store.insert(this.definition.name, correlationId, state);
 
       this.logger.info("Created new saga instance", {
         sagaName: this.definition.name,

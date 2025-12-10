@@ -50,6 +50,7 @@ pnpm dev
 | `DATABASE_URL` | `postgresql://saga:saga@localhost:5432/saga_bus` | PostgreSQL connection string |
 | `PORT` | `3000` | Health server port |
 | `HOST` | `0.0.0.0` | Health server host |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | `http://localhost:4318` | OpenTelemetry collector endpoint (Jaeger) |
 
 ## Architecture
 

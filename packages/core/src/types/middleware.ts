@@ -13,6 +13,8 @@ export interface SagaPipelineContext {
   readonly correlationId: string;
   /** Saga instance ID (set after state is loaded/created) */
   sagaId?: string;
+  /** Existing state loaded from store (null if new saga) */
+  existingState?: SagaState | null;
   /** State before handler execution */
   preState?: SagaState;
   /** State after handler execution */
@@ -23,6 +25,13 @@ export interface SagaPipelineContext {
   readonly metadata: Record<string, unknown>;
   /** Error if one occurred */
   error?: unknown;
+  /** Trace context to store with saga (set by tracing middleware) */
+  traceContext?: { traceParent: string; traceState: string | null };
+  /**
+   * Set trace context to be stored with the saga state.
+   * Called by tracing middleware for new sagas.
+   */
+  setTraceContext(traceParent: string, traceState: string | null): void;
 }
 
 /**

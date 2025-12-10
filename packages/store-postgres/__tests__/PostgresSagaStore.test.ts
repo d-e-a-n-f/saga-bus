@@ -69,7 +69,7 @@ describe("PostgresSagaStore", () => {
     it("should insert a new saga", async () => {
       const state = createTestState("saga-1");
 
-      await store.insertWithCorrelation(sagaName, "order-1", state);
+      await store.insert(sagaName, "order-1", state);
 
       const retrieved = await store.getById(sagaName, "saga-1");
       expect(retrieved).not.toBeNull();
@@ -79,10 +79,10 @@ describe("PostgresSagaStore", () => {
     it("should fail on duplicate insert", async () => {
       const state = createTestState("saga-1");
 
-      await store.insertWithCorrelation(sagaName, "order-1", state);
+      await store.insert(sagaName, "order-1", state);
 
       await expect(
-        store.insertWithCorrelation(sagaName, "order-1", state)
+        store.insert(sagaName, "order-1", state)
       ).rejects.toThrow();
     });
   });
@@ -90,7 +90,7 @@ describe("PostgresSagaStore", () => {
   describe("getById", () => {
     it("should retrieve an existing saga", async () => {
       const state = createTestState("saga-1", { status: "active" });
-      await store.insertWithCorrelation(sagaName, "order-1", state);
+      await store.insert(sagaName, "order-1", state);
 
       const retrieved = await store.getById(sagaName, "saga-1");
 
@@ -104,7 +104,7 @@ describe("PostgresSagaStore", () => {
 
     it("should parse dates correctly", async () => {
       const state = createTestState("saga-1");
-      await store.insertWithCorrelation(sagaName, "order-1", state);
+      await store.insert(sagaName, "order-1", state);
 
       const retrieved = await store.getById(sagaName, "saga-1");
 
@@ -116,7 +116,7 @@ describe("PostgresSagaStore", () => {
   describe("getByCorrelationId", () => {
     it("should retrieve saga by correlation ID", async () => {
       const state = createTestState("saga-1");
-      await store.insertWithCorrelation(sagaName, "order-123", state);
+      await store.insert(sagaName, "order-123", state);
 
       const retrieved = await store.getByCorrelationId(sagaName, "order-123");
 
@@ -132,7 +132,7 @@ describe("PostgresSagaStore", () => {
   describe("update", () => {
     it("should update an existing saga", async () => {
       const state = createTestState("saga-1");
-      await store.insertWithCorrelation(sagaName, "order-1", state);
+      await store.insert(sagaName, "order-1", state);
 
       const updated: TestState = {
         ...state,
@@ -153,7 +153,7 @@ describe("PostgresSagaStore", () => {
 
     it("should throw ConcurrencyError on version mismatch", async () => {
       const state = createTestState("saga-1");
-      await store.insertWithCorrelation(sagaName, "order-1", state);
+      await store.insert(sagaName, "order-1", state);
 
       const updated: TestState = {
         ...state,
@@ -177,7 +177,7 @@ describe("PostgresSagaStore", () => {
   describe("delete", () => {
     it("should delete an existing saga", async () => {
       const state = createTestState("saga-1");
-      await store.insertWithCorrelation(sagaName, "order-1", state);
+      await store.insert(sagaName, "order-1", state);
 
       await store.delete(sagaName, "saga-1");
 
@@ -196,7 +196,7 @@ describe("PostgresSagaStore", () => {
     it("should return sagas with pagination", async () => {
       // Insert multiple sagas
       for (let i = 0; i < 5; i++) {
-        await store.insertWithCorrelation(
+        await store.insert(
           sagaName,
           `order-${i}`,
           createTestState(`saga-${i}`)
@@ -211,12 +211,12 @@ describe("PostgresSagaStore", () => {
     });
 
     it("should filter by completion status", async () => {
-      await store.insertWithCorrelation(
+      await store.insert(
         sagaName,
         "order-1",
         createTestState("saga-1")
       );
-      await store.insertWithCorrelation(
+      await store.insert(
         sagaName,
         "order-2",
         createTestState("saga-2", {
@@ -240,8 +240,8 @@ describe("PostgresSagaStore", () => {
 
   describe("countByName", () => {
     it("should count sagas", async () => {
-      await store.insertWithCorrelation(sagaName, "order-1", createTestState("saga-1"));
-      await store.insertWithCorrelation(sagaName, "order-2", createTestState("saga-2"));
+      await store.insert(sagaName, "order-1", createTestState("saga-1"));
+      await store.insert(sagaName, "order-2", createTestState("saga-2"));
 
       const count = await store.countByName(sagaName);
       expect(count).toBe(2);
@@ -254,7 +254,7 @@ describe("PostgresSagaStore", () => {
       const newDate = new Date();
 
       // Old completed saga
-      await store.insertWithCorrelation(
+      await store.insert(
         sagaName,
         "order-1",
         createTestState("saga-1", {
@@ -269,7 +269,7 @@ describe("PostgresSagaStore", () => {
       );
 
       // New completed saga
-      await store.insertWithCorrelation(
+      await store.insert(
         sagaName,
         "order-2",
         createTestState("saga-2", {
@@ -284,7 +284,7 @@ describe("PostgresSagaStore", () => {
       );
 
       // Pending saga
-      await store.insertWithCorrelation(
+      await store.insert(
         sagaName,
         "order-3",
         createTestState("saga-3")
@@ -304,8 +304,8 @@ describe("PostgresSagaStore", () => {
 
   describe("isolation between saga types", () => {
     it("should isolate different saga names", async () => {
-      await store.insertWithCorrelation("OrderSaga", "order-1", createTestState("saga-1"));
-      await store.insertWithCorrelation("PaymentSaga", "order-1", createTestState("saga-1"));
+      await store.insert("OrderSaga", "order-1", createTestState("saga-1"));
+      await store.insert("PaymentSaga", "order-1", createTestState("saga-1"));
 
       const order = await store.getByCorrelationId("OrderSaga", "order-1");
       const payment = await store.getByCorrelationId("PaymentSaga", "order-1");

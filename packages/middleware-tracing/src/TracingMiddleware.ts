@@ -20,7 +20,8 @@ const TRACER_NAME = "@saga-bus/middleware-tracing";
  * OpenTelemetry tracing middleware for saga-bus.
  *
  * Creates spans for message handling with proper context propagation
- * for distributed tracing across services.
+ * for distributed tracing across services. Supports saga-correlated tracing
+ * where all messages for the same saga instance share the same trace.
  *
  * @example
  * ```typescript
@@ -48,8 +49,27 @@ export function createTracingMiddleware(
   return async (ctx: SagaPipelineContext, next: () => Promise<void>) => {
     const { envelope } = ctx;
 
-    // Extract parent context from message headers
-    const parentContext = extractContext(envelope);
+    // Determine parent context:
+    // 1. First check if saga state has stored trace context (for saga correlation)
+    // 2. Fall back to message headers (for standard distributed tracing)
+    // 3. Fall back to active context
+    let parentContext = context.active();
+    let isNewSaga = false;
+
+    // Check existing saga state for stored trace context
+    const existingState = ctx.existingState;
+    if (existingState?.metadata?.traceParent) {
+      // Use saga's stored trace context for correlation
+      const carrier: TraceContextHeaders = {
+        traceparent: existingState.metadata.traceParent,
+        tracestate: existingState.metadata.traceState ?? undefined,
+      };
+      parentContext = propagation.extract(context.active(), carrier);
+    } else if (envelope.headers?.traceparent) {
+      // Use message header trace context
+      parentContext = extractContext(envelope);
+      isNewSaga = true; // This is likely a new saga starting
+    }
 
     // Start span with parent context
     const spanName = `saga-bus.handle ${envelope.type}`;
@@ -78,6 +98,18 @@ export function createTracingMiddleware(
       span.setAttribute("saga.id", ctx.sagaId);
     }
     span.setAttribute("saga.correlation_id", ctx.correlationId);
+    span.setAttribute("saga.is_new", !existingState);
+
+    // If this is a new saga or saga has no trace context, store the current trace context
+    // so subsequent messages can be correlated
+    if (!existingState || !existingState.metadata?.traceParent) {
+      const carrier: TraceContextHeaders = {};
+      propagation.inject(trace.setSpan(context.active(), span), carrier);
+      if (carrier.traceparent) {
+        // Store trace context in pipeline context for orchestrator to persist
+        ctx.setTraceContext(carrier.traceparent, carrier.tracestate ?? null);
+      }
+    }
 
     try {
       // Run next middleware within span context

@@ -64,7 +64,7 @@ describe("MongoSagaStore", () => {
   describe("insert and getById", () => {
     it("should insert and retrieve a saga", async () => {
       const state = createTestState("saga-1");
-      await store.insert(sagaName, state);
+      await store.insert(sagaName, "corr-1", state);
 
       const retrieved = await store.getById(sagaName, "saga-1");
       expect(retrieved).not.toBeNull();
@@ -79,10 +79,8 @@ describe("MongoSagaStore", () => {
 
   describe("getByCorrelationId", () => {
     it("should retrieve saga by correlation ID", async () => {
-      const state = createTestState("saga-1", {
-        correlationId: "order-123",
-      });
-      await store.insert(sagaName, state);
+      const state = createTestState("saga-1");
+      await store.insert(sagaName, "order-123", state);
 
       const retrieved = await store.getByCorrelationId(sagaName, "order-123");
       expect(retrieved?.metadata.sagaId).toBe("saga-1");
@@ -92,7 +90,7 @@ describe("MongoSagaStore", () => {
   describe("update", () => {
     it("should update an existing saga", async () => {
       const state = createTestState("saga-1");
-      await store.insert(sagaName, state);
+      await store.insert(sagaName, "corr-1", state);
 
       const updated: TestState = {
         ...state,
@@ -109,7 +107,7 @@ describe("MongoSagaStore", () => {
 
     it("should throw ConcurrencyError on version mismatch", async () => {
       const state = createTestState("saga-1");
-      await store.insert(sagaName, state);
+      await store.insert(sagaName, "corr-1", state);
 
       const updated: TestState = {
         ...state,
@@ -125,7 +123,7 @@ describe("MongoSagaStore", () => {
   describe("delete", () => {
     it("should delete an existing saga", async () => {
       const state = createTestState("saga-1");
-      await store.insert(sagaName, state);
+      await store.insert(sagaName, "corr-1", state);
 
       await store.delete(sagaName, "saga-1");
 
@@ -137,7 +135,7 @@ describe("MongoSagaStore", () => {
   describe("findByName", () => {
     it("should return sagas with pagination", async () => {
       for (let i = 0; i < 5; i++) {
-        await store.insert(sagaName, createTestState(`saga-${i}`));
+        await store.insert(sagaName, `corr-${i}`, createTestState(`saga-${i}`));
       }
 
       const page1 = await store.findByName(sagaName, { limit: 2, offset: 0 });
@@ -148,9 +146,10 @@ describe("MongoSagaStore", () => {
     });
 
     it("should filter by completed status", async () => {
-      await store.insert(sagaName, createTestState("saga-1"));
+      await store.insert(sagaName, "corr-1", createTestState("saga-1"));
       await store.insert(
         sagaName,
+        "corr-2",
         createTestState("saga-2", {
           metadata: {
             sagaId: "saga-2",
@@ -173,7 +172,7 @@ describe("MongoSagaStore", () => {
   describe("countByName", () => {
     it("should count sagas by name", async () => {
       for (let i = 0; i < 3; i++) {
-        await store.insert(sagaName, createTestState(`saga-${i}`));
+        await store.insert(sagaName, `corr-${i}`, createTestState(`saga-${i}`));
       }
 
       const count = await store.countByName(sagaName);
@@ -181,9 +180,10 @@ describe("MongoSagaStore", () => {
     });
 
     it("should filter count by completed status", async () => {
-      await store.insert(sagaName, createTestState("saga-1"));
+      await store.insert(sagaName, "corr-1", createTestState("saga-1"));
       await store.insert(
         sagaName,
+        "corr-2",
         createTestState("saga-2", {
           metadata: {
             sagaId: "saga-2",
@@ -214,6 +214,7 @@ describe("MongoSagaStore", () => {
 
       await store.insert(
         sagaName,
+        "corr-old-completed",
         createTestState("old-completed", {
           metadata: {
             sagaId: "old-completed",
@@ -227,6 +228,7 @@ describe("MongoSagaStore", () => {
 
       await store.insert(
         sagaName,
+        "corr-new-completed",
         createTestState("new-completed", {
           metadata: {
             sagaId: "new-completed",
@@ -240,6 +242,7 @@ describe("MongoSagaStore", () => {
 
       await store.insert(
         sagaName,
+        "corr-old-active",
         createTestState("old-active", {
           metadata: {
             sagaId: "old-active",
@@ -267,8 +270,8 @@ describe("MongoSagaStore", () => {
 
   describe("isolation between saga types", () => {
     it("should isolate different saga names", async () => {
-      await store.insert("OrderSaga", createTestState("saga-1"));
-      await store.insert("PaymentSaga", createTestState("saga-1"));
+      await store.insert("OrderSaga", "corr-1", createTestState("saga-1"));
+      await store.insert("PaymentSaga", "corr-1", createTestState("saga-1"));
 
       const orderCount = await store.countByName("OrderSaga");
       const paymentCount = await store.countByName("PaymentSaga");
@@ -278,8 +281,8 @@ describe("MongoSagaStore", () => {
     });
 
     it("should allow same sagaId for different saga types", async () => {
-      await store.insert("OrderSaga", createTestState("shared-id"));
-      await store.insert("PaymentSaga", createTestState("shared-id"));
+      await store.insert("OrderSaga", "corr-1", createTestState("shared-id"));
+      await store.insert("PaymentSaga", "corr-1", createTestState("shared-id"));
 
       const orderSaga = await store.getById("OrderSaga", "shared-id");
       const paymentSaga = await store.getById("PaymentSaga", "shared-id");

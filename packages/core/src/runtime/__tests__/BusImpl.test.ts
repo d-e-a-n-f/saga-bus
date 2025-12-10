@@ -60,12 +60,10 @@ class MockStore<T extends SagaState> {
     return this.getById(sagaName, sagaId);
   }
 
-  async insert(sagaName: string, state: T): Promise<void> {
+  async insert(sagaName: string, correlationId: string, state: T): Promise<void> {
     this.store.set(`${sagaName}:${state.metadata.sagaId}`, { ...state });
-  }
-
-  indexByCorrelationId(sagaName: string, correlationId: string, sagaId: string): void {
-    this.correlationIndex.set(`${sagaName}:${correlationId}`, sagaId);
+    // Index by correlation ID
+    this.correlationIndex.set(`${sagaName}:${correlationId}`, state.metadata.sagaId);
   }
 
   async update(sagaName: string, state: T, expectedVersion: number): Promise<void> {

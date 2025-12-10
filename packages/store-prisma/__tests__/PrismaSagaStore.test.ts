@@ -207,7 +207,7 @@ describe("PrismaSagaStore", () => {
     it("should insert a new saga", async () => {
       const state = createTestState("saga-1");
 
-      await store.insertWithCorrelation(sagaName, "order-1", state);
+      await store.insert(sagaName, "order-1", state);
 
       const retrieved = await store.getById(sagaName, "saga-1");
       expect(retrieved).not.toBeNull();
@@ -217,10 +217,10 @@ describe("PrismaSagaStore", () => {
     it("should fail on duplicate insert", async () => {
       const state = createTestState("saga-1");
 
-      await store.insertWithCorrelation(sagaName, "order-1", state);
+      await store.insert(sagaName, "order-1", state);
 
       await expect(
-        store.insertWithCorrelation(sagaName, "order-2", state)
+        store.insert(sagaName, "order-2", state)
       ).rejects.toThrow();
     });
   });
@@ -228,7 +228,7 @@ describe("PrismaSagaStore", () => {
   describe("getById", () => {
     it("should retrieve an existing saga", async () => {
       const state = createTestState("saga-1", { status: "active" });
-      await store.insertWithCorrelation(sagaName, "order-1", state);
+      await store.insert(sagaName, "order-1", state);
 
       const retrieved = await store.getById(sagaName, "saga-1");
 
@@ -242,7 +242,7 @@ describe("PrismaSagaStore", () => {
 
     it("should return null for wrong saga name", async () => {
       const state = createTestState("saga-1");
-      await store.insertWithCorrelation("OtherSaga", "order-1", state);
+      await store.insert("OtherSaga", "order-1", state);
 
       const retrieved = await store.getById(sagaName, "saga-1");
       expect(retrieved).toBeNull();
@@ -252,7 +252,7 @@ describe("PrismaSagaStore", () => {
   describe("getByCorrelationId", () => {
     it("should retrieve saga by correlation ID", async () => {
       const state = createTestState("saga-1");
-      await store.insertWithCorrelation(sagaName, "order-123", state);
+      await store.insert(sagaName, "order-123", state);
 
       const retrieved = await store.getByCorrelationId(sagaName, "order-123");
 
@@ -271,7 +271,7 @@ describe("PrismaSagaStore", () => {
   describe("update", () => {
     it("should update an existing saga", async () => {
       const state = createTestState("saga-1");
-      await store.insertWithCorrelation(sagaName, "order-1", state);
+      await store.insert(sagaName, "order-1", state);
 
       const updated: TestState = {
         ...state,
@@ -292,7 +292,7 @@ describe("PrismaSagaStore", () => {
 
     it("should throw ConcurrencyError on version mismatch", async () => {
       const state = createTestState("saga-1");
-      await store.insertWithCorrelation(sagaName, "order-1", state);
+      await store.insert(sagaName, "order-1", state);
 
       const updated: TestState = {
         ...state,
@@ -316,7 +316,7 @@ describe("PrismaSagaStore", () => {
   describe("delete", () => {
     it("should delete an existing saga", async () => {
       const state = createTestState("saga-1");
-      await store.insertWithCorrelation(sagaName, "order-1", state);
+      await store.insert(sagaName, "order-1", state);
 
       await store.delete(sagaName, "saga-1");
 
@@ -334,7 +334,7 @@ describe("PrismaSagaStore", () => {
   describe("findByName", () => {
     it("should return sagas with pagination", async () => {
       for (let i = 0; i < 5; i++) {
-        await store.insertWithCorrelation(
+        await store.insert(
           sagaName,
           `order-${i}`,
           createTestState(`saga-${i}`)
@@ -349,12 +349,12 @@ describe("PrismaSagaStore", () => {
     });
 
     it("should filter by completion status", async () => {
-      await store.insertWithCorrelation(
+      await store.insert(
         sagaName,
         "order-1",
         createTestState("saga-1")
       );
-      await store.insertWithCorrelation(
+      await store.insert(
         sagaName,
         "order-2",
         createTestState("saga-2", {
@@ -378,12 +378,12 @@ describe("PrismaSagaStore", () => {
 
   describe("countByName", () => {
     it("should count sagas", async () => {
-      await store.insertWithCorrelation(
+      await store.insert(
         sagaName,
         "order-1",
         createTestState("saga-1")
       );
-      await store.insertWithCorrelation(
+      await store.insert(
         sagaName,
         "order-2",
         createTestState("saga-2")
@@ -399,7 +399,7 @@ describe("PrismaSagaStore", () => {
       const oldDate = new Date("2020-01-01");
       const newDate = new Date();
 
-      await store.insertWithCorrelation(
+      await store.insert(
         sagaName,
         "order-1",
         createTestState("saga-1", {
@@ -413,7 +413,7 @@ describe("PrismaSagaStore", () => {
         })
       );
 
-      await store.insertWithCorrelation(
+      await store.insert(
         sagaName,
         "order-2",
         createTestState("saga-2", {
@@ -427,7 +427,7 @@ describe("PrismaSagaStore", () => {
         })
       );
 
-      await store.insertWithCorrelation(
+      await store.insert(
         sagaName,
         "order-3",
         createTestState("saga-3")
@@ -447,12 +447,12 @@ describe("PrismaSagaStore", () => {
 
   describe("isolation between saga types", () => {
     it("should isolate different saga names", async () => {
-      await store.insertWithCorrelation(
+      await store.insert(
         "OrderSaga",
         "order-1",
         createTestState("saga-1")
       );
-      await store.insertWithCorrelation(
+      await store.insert(
         "PaymentSaga",
         "order-1",
         createTestState("saga-1")
