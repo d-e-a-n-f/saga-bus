@@ -64,6 +64,25 @@ CREATE TABLE saga_instances (
 | `schema` | `string` | `"public"` | Database schema |
 | `tableName` | `string` | `"saga_instances"` | Table name |
 
+## Sharing Across Sagas
+
+A single store instance can be shared across multiple sagas:
+
+```typescript
+const store = new PostgresSagaStore({ pool });
+
+const bus = createBus({
+  transport,
+  store, // shared by all sagas
+  sagas: [
+    { definition: orderSaga },
+    { definition: paymentSaga },
+  ],
+});
+```
+
+Data is isolated by `saga_name` in the database, so different saga types won't conflict.
+
 ## License
 
 MIT

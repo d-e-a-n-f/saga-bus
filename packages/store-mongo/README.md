@@ -69,6 +69,25 @@ The store automatically creates indexes on:
 | `db` | `Db` | required | MongoDB database instance |
 | `collectionName` | `string` | `"saga_instances"` | Collection name |
 
+## Sharing Across Sagas
+
+A single store instance can be shared across multiple sagas:
+
+```typescript
+const store = new MongoSagaStore({ db });
+
+const bus = createBus({
+  transport,
+  store, // shared by all sagas
+  sagas: [
+    { definition: orderSaga },
+    { definition: paymentSaga },
+  ],
+});
+```
+
+Data is isolated by `sagaName` in the collection, so different saga types won't conflict.
+
 ## Cleanup
 
 Query completed sagas for cleanup:

@@ -54,6 +54,25 @@ const bus = createBus({
 - Type-safe state serialization
 - Works with any Prisma-supported database
 
+## Sharing Across Sagas
+
+A single store instance can be shared across multiple sagas:
+
+```typescript
+const store = new PrismaSagaStore({ prisma });
+
+const bus = createBus({
+  transport,
+  store, // shared by all sagas
+  sagas: [
+    { definition: orderSaga },
+    { definition: paymentSaga },
+  ],
+});
+```
+
+Data is isolated by `sagaName` in the database, so different saga types won't conflict.
+
 ## License
 
 MIT

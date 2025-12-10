@@ -63,6 +63,25 @@ The store uses a single-table design:
 | `correlationIndexName` | `string` | `"GSI1"` | Correlation GSI name |
 | `cleanupIndexName` | `string` | `"GSI2"` | Cleanup GSI name |
 
+## Sharing Across Sagas
+
+A single store instance can be shared across multiple sagas:
+
+```typescript
+const store = new DynamoDBSagaStore({ client, tableName: "saga-instances" });
+
+const bus = createBus({
+  transport,
+  store, // shared by all sagas
+  sagas: [
+    { definition: orderSaga },
+    { definition: paymentSaga },
+  ],
+});
+```
+
+Data is isolated by `sagaName` in the partition key, so different saga types won't conflict.
+
 ## Table Management
 
 ```typescript
