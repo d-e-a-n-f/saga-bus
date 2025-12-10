@@ -4,6 +4,7 @@ import type {
   BaseMessage,
   Transport,
   TransportPublishOptions,
+  SagaStateMetadata,
 } from "../types/index.js";
 
 export interface SagaContextImplOptions {
@@ -13,6 +14,17 @@ export interface SagaContextImplOptions {
   envelope: MessageEnvelope;
   transport: Transport;
   defaultEndpoint?: string;
+  /** Current saga metadata (for reading existing timeout) */
+  currentMetadata?: SagaStateMetadata;
+}
+
+/**
+ * Pending timeout changes to be applied to saga state.
+ */
+export interface PendingTimeoutChange {
+  type: "set" | "clear";
+  timeoutMs?: number;
+  timeoutExpiresAt?: Date;
 }
 
 /**
@@ -28,6 +40,8 @@ export class SagaContextImpl implements SagaContext {
   private readonly transport: Transport;
   private readonly defaultEndpoint?: string;
   private _isCompleted = false;
+  private _currentMetadata?: SagaStateMetadata;
+  private _pendingTimeoutChange?: PendingTimeoutChange;
 
   constructor(options: SagaContextImplOptions) {
     this.sagaName = options.sagaName;
@@ -36,6 +50,7 @@ export class SagaContextImpl implements SagaContext {
     this.envelope = options.envelope;
     this.transport = options.transport;
     this.defaultEndpoint = options.defaultEndpoint;
+    this._currentMetadata = options.currentMetadata;
   }
 
   async publish<TMessage extends BaseMessage>(
@@ -81,5 +96,61 @@ export class SagaContextImpl implements SagaContext {
    */
   get isCompleted(): boolean {
     return this._isCompleted;
+  }
+
+  setTimeout(delayMs: number): void {
+    if (delayMs <= 0) {
+      throw new Error("Timeout delay must be positive");
+    }
+    const now = new Date();
+    this._pendingTimeoutChange = {
+      type: "set",
+      timeoutMs: delayMs,
+      timeoutExpiresAt: new Date(now.getTime() + delayMs),
+    };
+  }
+
+  clearTimeout(): void {
+    this._pendingTimeoutChange = {
+      type: "clear",
+    };
+  }
+
+  getTimeoutRemaining(): number | null {
+    // If there's a pending change, use that
+    if (this._pendingTimeoutChange) {
+      if (this._pendingTimeoutChange.type === "clear") {
+        return null;
+      }
+      if (this._pendingTimeoutChange.timeoutExpiresAt) {
+        const remaining =
+          this._pendingTimeoutChange.timeoutExpiresAt.getTime() - Date.now();
+        return Math.max(0, remaining);
+      }
+    }
+
+    // Otherwise use current metadata
+    if (this._currentMetadata?.timeoutExpiresAt) {
+      const remaining =
+        this._currentMetadata.timeoutExpiresAt.getTime() - Date.now();
+      return Math.max(0, remaining);
+    }
+
+    return null;
+  }
+
+  /**
+   * Get any pending timeout change to be applied to saga state.
+   * Used by SagaOrchestrator when updating state.
+   */
+  get pendingTimeoutChange(): PendingTimeoutChange | undefined {
+    return this._pendingTimeoutChange;
+  }
+
+  /**
+   * Update the current metadata reference (called after state is loaded/created).
+   */
+  updateCurrentMetadata(metadata: SagaStateMetadata): void {
+    this._currentMetadata = metadata;
   }
 }

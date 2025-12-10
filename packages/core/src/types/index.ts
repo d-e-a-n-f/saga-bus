@@ -2,7 +2,10 @@
 export type {
   BaseMessage,
   MessageEnvelope,
+  SagaTimeoutExpired,
 } from "./messages.js";
+
+export { SAGA_TIMEOUT_MESSAGE_TYPE } from "./messages.js";
 
 // Transport
 export type {

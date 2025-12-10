@@ -21,6 +21,10 @@ export interface SagaStateMetadata {
   readonly traceParent?: string | null;
   /** W3C tracestate header for distributed tracing */
   readonly traceState?: string | null;
+  /** Configured timeout duration in milliseconds */
+  readonly timeoutMs?: number | null;
+  /** When the timeout expires (if set) */
+  readonly timeoutExpiresAt?: Date | null;
 }
 
 /**
@@ -117,6 +121,24 @@ export interface SagaContext {
    * Get a metadata value.
    */
   getMetadata<T = unknown>(key: string): T | undefined;
+
+  /**
+   * Set a timeout for this saga. When the timeout expires, a SagaTimeoutExpired
+   * message will be published to the saga. Calling this again resets the timeout.
+   * @param delayMs - Timeout duration in milliseconds
+   */
+  setTimeout(delayMs: number): void;
+
+  /**
+   * Clear any pending timeout for this saga.
+   */
+  clearTimeout(): void;
+
+  /**
+   * Get the remaining time until timeout expires.
+   * @returns Milliseconds remaining, or null if no timeout is set
+   */
+  getTimeoutRemaining(): number | null;
 }
 
 /**

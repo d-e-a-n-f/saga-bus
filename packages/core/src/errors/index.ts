@@ -54,3 +54,30 @@ export class ValidationError extends Error {
     this.value = value;
   }
 }
+
+/**
+ * Thrown when a saga timeout expires.
+ * Can be used in handlers to detect timeout scenarios.
+ */
+export class SagaTimeoutError extends Error {
+  readonly sagaId: string;
+  readonly sagaName: string;
+  readonly correlationId: string;
+  readonly timeoutMs: number;
+
+  constructor(
+    sagaId: string,
+    sagaName: string,
+    correlationId: string,
+    timeoutMs: number
+  ) {
+    super(
+      `Saga timeout expired: ${sagaName} (${sagaId}) after ${timeoutMs}ms`
+    );
+    this.name = "SagaTimeoutError";
+    this.sagaId = sagaId;
+    this.sagaName = sagaName;
+    this.correlationId = correlationId;
+    this.timeoutMs = timeoutMs;
+  }
+}

@@ -7,7 +7,9 @@ import type {
   SagaPipelineContext,
   Transport,
   Logger,
+  SagaTimeoutExpired,
 } from "../types/index.js";
+import { SAGA_TIMEOUT_MESSAGE_TYPE } from "../types/index.js";
 import { ConcurrencyError } from "../errors/index.js";
 import { SagaContextImpl } from "./SagaContextImpl.js";
 import { MiddlewarePipeline } from "./MiddlewarePipeline.js";
@@ -22,6 +24,8 @@ export interface SagaOrchestratorOptions<
   transport: Transport;
   pipeline: MiddlewarePipeline;
   logger: Logger;
+  /** Default endpoint for publishing messages (including timeout messages) */
+  defaultEndpoint?: string;
 }
 
 /**
@@ -36,6 +40,7 @@ export class SagaOrchestrator<
   private readonly transport: Transport;
   private readonly pipeline: MiddlewarePipeline;
   private readonly logger: Logger;
+  private readonly defaultEndpoint?: string;
 
   constructor(options: SagaOrchestratorOptions<TState, TMessages>) {
     this.definition = options.definition;
@@ -43,6 +48,7 @@ export class SagaOrchestrator<
     this.transport = options.transport;
     this.pipeline = options.pipeline;
     this.logger = options.logger;
+    this.defaultEndpoint = options.defaultEndpoint;
   }
 
   /**
@@ -174,13 +180,15 @@ export class SagaOrchestrator<
       return;
     }
 
-    // Create handler context
+    // Create handler context with current metadata for timeout tracking
     const ctx = new SagaContextImpl({
       sagaName: this.definition.name,
       sagaId,
       correlationId,
       envelope,
       transport: this.transport,
+      defaultEndpoint: this.defaultEndpoint,
+      currentMetadata: state.metadata,
     });
 
     // Execute handler
@@ -189,8 +197,24 @@ export class SagaOrchestrator<
     // Determine completion
     const isCompleted = result.isCompleted ?? ctx.isCompleted;
 
-    // Update state with new metadata
+    // Build new metadata with timeout changes
     const expectedVersion = state.metadata.version;
+    const pendingTimeout = ctx.pendingTimeoutChange;
+
+    let timeoutMs = state.metadata.timeoutMs;
+    let timeoutExpiresAt = state.metadata.timeoutExpiresAt;
+
+    if (pendingTimeout) {
+      if (pendingTimeout.type === "clear") {
+        timeoutMs = null;
+        timeoutExpiresAt = null;
+      } else if (pendingTimeout.type === "set") {
+        timeoutMs = pendingTimeout.timeoutMs ?? null;
+        timeoutExpiresAt = pendingTimeout.timeoutExpiresAt ?? null;
+      }
+    }
+
+    // Update state with new metadata
     const newState: TState = {
       ...result.newState,
       metadata: {
@@ -198,6 +222,8 @@ export class SagaOrchestrator<
         version: expectedVersion + 1,
         updatedAt: now(),
         isCompleted,
+        timeoutMs,
+        timeoutExpiresAt,
       },
     };
 
@@ -220,6 +246,16 @@ export class SagaOrchestrator<
       throw error;
     }
 
+    // Schedule timeout message if timeout was set (and saga not completed)
+    if (pendingTimeout?.type === "set" && !isCompleted && pendingTimeout.timeoutMs) {
+      await this.scheduleTimeoutMessage(
+        sagaId,
+        correlationId,
+        pendingTimeout.timeoutMs,
+        pendingTimeout.timeoutExpiresAt ?? new Date()
+      );
+    }
+
     if (isCompleted) {
       this.logger.info("Saga completed", {
         sagaName: this.definition.name,
@@ -233,6 +269,41 @@ export class SagaOrchestrator<
         version: newState.metadata.version,
       });
     }
+  }
+
+  /**
+   * Schedule a timeout message for delayed delivery.
+   */
+  private async scheduleTimeoutMessage(
+    sagaId: string,
+    correlationId: string,
+    timeoutMs: number,
+    timeoutExpiresAt: Date
+  ): Promise<void> {
+    const timeoutMessage: SagaTimeoutExpired = {
+      type: SAGA_TIMEOUT_MESSAGE_TYPE,
+      sagaId,
+      sagaName: this.definition.name,
+      correlationId,
+      timeoutMs,
+      timeoutSetAt: new Date(timeoutExpiresAt.getTime() - timeoutMs),
+    };
+
+    const endpoint = this.defaultEndpoint ?? SAGA_TIMEOUT_MESSAGE_TYPE;
+
+    await this.transport.publish(timeoutMessage, {
+      endpoint,
+      delayMs: timeoutMs,
+      key: correlationId, // Use correlation ID for ordering
+    });
+
+    this.logger.debug("Scheduled timeout message", {
+      sagaName: this.definition.name,
+      sagaId,
+      correlationId,
+      timeoutMs,
+      timeoutExpiresAt: timeoutExpiresAt.toISOString(),
+    });
   }
 
   /**
