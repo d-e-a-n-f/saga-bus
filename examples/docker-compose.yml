@@ -34,6 +34,23 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./init-db.sql:/docker-entrypoint-initdb.d/init.sql
 
+  # Database Admin UI
+  pgadmin:
+    image: dpage/pgadmin4:8.3
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@saga-bus.local
+      PGADMIN_DEFAULT_PASSWORD: saga
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ./pgadmin-servers.json:/pgadmin4/servers.json
+    depends_on:
+      postgres:
+        condition: service_healthy
+
   # Distributed Tracing
   jaeger:
     image: jaegertracing/all-in-one:1.54
@@ -74,4 +91,5 @@ services:
 volumes:
   rabbitmq_data:
   postgres_data:
+  pgadmin_data:
   grafana_data:

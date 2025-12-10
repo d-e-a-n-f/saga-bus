@@ -15,6 +15,7 @@ docker-compose ps
 open http://localhost:3001    # Next.js - Submit orders
 open http://localhost:3002/api # NestJS - Swagger docs
 open http://localhost:15672   # RabbitMQ Management (saga/saga)
+open http://localhost:5050    # pgAdmin (admin@saga-bus.local / saga)
 open http://localhost:16686   # Jaeger Tracing
 open http://localhost:3003    # Grafana Dashboards
 open http://localhost:9090    # Prometheus
@@ -63,6 +64,7 @@ A full API service that:
 |---------|------|-------------|
 | RabbitMQ | 5672 (AMQP), 15672 (UI) | Message broker |
 | PostgreSQL | 5432 | Saga state storage |
+| pgAdmin | 5050 | Database admin UI |
 | Jaeger | 16686 (UI), 4317/4318 (OTLP) | Distributed tracing |
 | Prometheus | 9090 | Metrics collection |
 | Grafana | 3003 | Dashboards |

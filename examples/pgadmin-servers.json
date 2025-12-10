@@ -1,0 +1,14 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "Saga Bus (Local)",
+      "Group": "Servers",
+      "Host": "postgres",
+      "Port": 5432,
+      "MaintenanceDB": "saga_bus",
+      "Username": "saga",
+      "PassFile": "/pgadmin4/pgpass",
+      "SSLMode": "prefer"
+    }
+  }
+}
