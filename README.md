@@ -204,6 +204,30 @@ const state = await harness.getSagaState("OrderSaga", "123");
 expect(state?.status).toBe("submitted");
 ```
 
+## Examples
+
+See the [examples](./examples) directory for complete working applications:
+
+| Example | Pattern | Description |
+|---------|---------|-------------|
+| [example-worker](./apps/example-worker) | Background Worker | Standalone saga processor with health/metrics |
+| [example-nextjs](./apps/example-nextjs) | Message Producer | Next.js UI that publishes to RabbitMQ |
+| [example-nestjs](./apps/example-nestjs) | Monolith | Full NestJS API with Swagger docs |
+
+### Quick Start
+
+```bash
+cd examples
+docker-compose up -d
+
+# UIs available at:
+# - http://localhost:3001   Next.js order form
+# - http://localhost:3002/api   NestJS Swagger
+# - http://localhost:15672   RabbitMQ Management
+# - http://localhost:16686   Jaeger Tracing
+# - http://localhost:3003   Grafana Dashboards
+```
+
 ## Development
 
 ```bash
