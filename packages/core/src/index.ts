@@ -50,3 +50,11 @@ export type {
 // Runtime
 export { createBus } from "./runtime/index.js";
 export { DefaultLogger } from "./runtime/index.js";
+
+// Runtime - Error handling
+export { DefaultErrorHandler, createErrorHandler } from "./runtime/index.js";
+export {
+  RETRY_HEADERS,
+  DEFAULT_RETRY_POLICY,
+  defaultDlqNaming,
+} from "./runtime/index.js";

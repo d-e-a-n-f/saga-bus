@@ -5,25 +5,49 @@ import type {
   TransportPublishOptions,
   SagaState,
   Logger,
+  ErrorHandler,
+  WorkerRetryPolicy,
 } from "../types/index.js";
 import { SagaOrchestrator } from "./SagaOrchestrator.js";
 import { MiddlewarePipeline } from "./MiddlewarePipeline.js";
 import { DefaultLogger } from "./DefaultLogger.js";
+import { DefaultErrorHandler } from "./DefaultErrorHandler.js";
+import {
+  RetryHandler,
+  DEFAULT_RETRY_POLICY,
+  defaultDlqNaming,
+  getAttemptCount,
+} from "./RetryHandler.js";
 
 /**
- * Main bus implementation.
+ * Main bus implementation with retry and DLQ support.
  */
 export class BusImpl implements Bus {
   private readonly config: BusConfig;
   private readonly logger: Logger;
+  private readonly errorHandler: ErrorHandler;
   private readonly pipeline: MiddlewarePipeline;
   private readonly orchestrators: SagaOrchestrator<SagaState, BaseMessage>[];
+  private readonly retryHandler: RetryHandler;
+  private readonly defaultRetryPolicy: WorkerRetryPolicy;
   private started = false;
 
   constructor(config: BusConfig) {
     this.config = config;
     this.logger = config.logger ?? new DefaultLogger();
+    this.errorHandler = config.errorHandler ?? new DefaultErrorHandler();
     this.pipeline = new MiddlewarePipeline(config.middleware ? [...config.middleware] : []);
+
+    // Set up retry configuration
+    this.defaultRetryPolicy = config.worker?.retryPolicy ?? DEFAULT_RETRY_POLICY;
+    const dlqNaming = config.worker?.dlqNaming ?? defaultDlqNaming;
+
+    this.retryHandler = new RetryHandler({
+      transport: config.transport,
+      logger: this.logger,
+      defaultPolicy: this.defaultRetryPolicy,
+      dlqNaming,
+    });
 
     // Create orchestrators for each registered saga
     this.orchestrators = config.sagas.map((registration) => {
@@ -52,11 +76,9 @@ export class BusImpl implements Bus {
 
     for (const orchestrator of this.orchestrators) {
       for (const messageType of orchestrator.handledMessageTypes) {
-        // Use message type as endpoint (can be customized later)
         const endpoint = messageType;
+        const subscriptionKey = endpoint;
 
-        // Avoid duplicate subscriptions if multiple sagas handle same message
-        const subscriptionKey = `${endpoint}`;
         if (subscribed.has(subscriptionKey)) {
           continue;
         }
@@ -68,29 +90,52 @@ export class BusImpl implements Bus {
           1;
 
         await this.config.transport.subscribe(
-          {
-            endpoint,
-            concurrency,
-          },
+          { endpoint, concurrency },
           async (envelope) => {
-            // Find all orchestrators that handle this message type
             const handlers = this.orchestrators.filter((o) =>
               o.handledMessageTypes.includes(envelope.type)
             );
 
-            // Process through each orchestrator
             for (const handler of handlers) {
+              // Get the retry policy for this specific saga
+              const retryPolicy =
+                this.config.worker?.sagas?.[handler.name]?.retryPolicy ??
+                this.defaultRetryPolicy;
+
               try {
                 await handler.processMessage(envelope);
               } catch (error) {
+                // Log the error
                 this.logger.error("Error processing message", {
                   sagaName: handler.name,
                   messageType: envelope.type,
                   messageId: envelope.id,
+                  attempt: getAttemptCount(envelope),
                   error: error instanceof Error ? error.message : String(error),
                 });
-                // Re-throw for transport to handle (retry/DLQ)
-                throw error;
+
+                // Classify the error
+                const action = await this.errorHandler.handle(error, {
+                  envelope,
+                  sagaName: handler.name,
+                  correlationId: "",
+                  metadata: {},
+                  error,
+                });
+
+                if (action === "retry") {
+                  await this.retryHandler.handleFailure(
+                    envelope,
+                    endpoint,
+                    error,
+                    retryPolicy
+                  );
+                } else if (action === "dlq") {
+                  await this.retryHandler.sendToDlq(envelope, endpoint, error);
+                }
+                // action === "drop" means we just drop the message
+
+                // Don't re-throw - we've handled the error
               }
             }
           }
