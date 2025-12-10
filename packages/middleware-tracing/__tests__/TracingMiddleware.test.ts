@@ -40,6 +40,7 @@ function createContext(
     handlerResult: undefined,
     metadata: {},
     error: undefined,
+    setTraceContext: () => {},
   };
 }
 

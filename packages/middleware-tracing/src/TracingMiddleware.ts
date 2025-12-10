@@ -54,7 +54,6 @@ export function createTracingMiddleware(
     // 2. Fall back to message headers (for standard distributed tracing)
     // 3. Fall back to active context
     let parentContext = context.active();
-    let isNewSaga = false;
 
     // Check existing saga state for stored trace context
     const existingState = ctx.existingState;
@@ -68,7 +67,6 @@ export function createTracingMiddleware(
     } else if (envelope.headers?.traceparent) {
       // Use message header trace context
       parentContext = extractContext(envelope);
-      isNewSaga = true; // This is likely a new saga starting
     }
 
     // Start span with parent context

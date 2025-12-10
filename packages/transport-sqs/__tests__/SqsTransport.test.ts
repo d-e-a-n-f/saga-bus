@@ -84,7 +84,7 @@ describe("SqsTransport", () => {
         // Ignore purge errors (rate limiting)
       }
     }
-  });
+  }, 30_000);
 
   describe("constructor", () => {
     it("should reject non-FIFO queue URLs", () => {

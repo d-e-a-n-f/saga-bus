@@ -1,7 +1,6 @@
 import type { FastifyPluginAsync, FastifyError } from "fastify";
 import fp from "fastify-plugin";
 import { randomUUID } from "crypto";
-import type { Bus } from "@saga-bus/core";
 import type { SagaBusFastifyOptions, HealthCheckConfig, HealthStatus } from "./types.js";
 
 const sagaBusPlugin: FastifyPluginAsync<SagaBusFastifyOptions> = async (
