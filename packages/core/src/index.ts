@@ -46,3 +46,7 @@ export type {
   StateGuard,
   InitialStateFactory,
 } from "./dsl/index.js";
+
+// Runtime
+export { createBus } from "./runtime/index.js";
+export { DefaultLogger } from "./runtime/index.js";
