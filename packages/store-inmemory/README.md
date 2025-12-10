@@ -27,7 +27,28 @@ const bus = createBus({
 - Optimistic concurrency control
 - Correlation ID indexing
 - State versioning
-- Zero persistence (memory only)
+- Zero configuration
+- Instant operations
+
+## When to Use
+
+**Use for:**
+- Unit and integration tests
+- Local development
+- Prototyping
+
+**Do not use for:**
+- Production deployments
+- Multi-instance applications
+- Data that needs to survive restarts
+
+## Limitations
+
+- **No persistence**: All data is lost when the process exits
+- **Single process only**: State is not shared between instances
+- **Memory bound**: Large numbers of sagas may consume significant memory
+
+For production, use a persistent store like [@saga-bus/store-postgres](../store-postgres), [@saga-bus/store-mongo](../store-mongo), or [@saga-bus/store-dynamodb](../store-dynamodb).
 
 ## License
 

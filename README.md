@@ -6,23 +6,54 @@ A MassTransit-style saga orchestration library for TypeScript/Node.js.
 
 - **Type-Safe Sagas**: Full TypeScript support with fluent DSL
 - **Message-Driven**: Publish/subscribe with correlation
-- **Pluggable Storage**: In-memory, PostgreSQL, or Prisma
-- **Pluggable Transport**: In-memory or RabbitMQ
-- **Middleware Pipeline**: Extensible processing
+- **Pluggable Storage**: In-memory, PostgreSQL, MongoDB, DynamoDB, or Prisma
+- **Pluggable Transport**: In-memory, RabbitMQ, SQS, or Kafka
+- **Middleware Pipeline**: Logging, tracing, multi-tenancy
+- **Framework Integrations**: NestJS and Next.js support
 - **Testing First**: Built-in test harness
 
 ## Packages
 
+### Core
+
 | Package | Description |
 |---------|-------------|
-| `@saga-bus/core` | Core types, DSL, and runtime |
-| `@saga-bus/transport-inmemory` | In-memory transport for testing |
-| `@saga-bus/transport-rabbitmq` | RabbitMQ production transport |
-| `@saga-bus/store-inmemory` | In-memory store for testing |
-| `@saga-bus/store-postgres` | PostgreSQL store with pg driver |
-| `@saga-bus/store-prisma` | Prisma ORM adapter |
-| `@saga-bus/middleware-logging` | Structured logging middleware |
-| `@saga-bus/test` | Testing utilities |
+| [@saga-bus/core](./packages/core) | Core types, DSL, and runtime |
+| [@saga-bus/test](./packages/test) | Testing utilities and harness |
+
+### Transports
+
+| Package | Description |
+|---------|-------------|
+| [@saga-bus/transport-inmemory](./packages/transport-inmemory) | In-memory transport for testing |
+| [@saga-bus/transport-rabbitmq](./packages/transport-rabbitmq) | RabbitMQ for production |
+| [@saga-bus/transport-sqs](./packages/transport-sqs) | AWS SQS FIFO queues |
+| [@saga-bus/transport-kafka](./packages/transport-kafka) | Apache Kafka |
+
+### Stores
+
+| Package | Description |
+|---------|-------------|
+| [@saga-bus/store-inmemory](./packages/store-inmemory) | In-memory store for testing |
+| [@saga-bus/store-postgres](./packages/store-postgres) | PostgreSQL with pg driver |
+| [@saga-bus/store-prisma](./packages/store-prisma) | Prisma ORM adapter |
+| [@saga-bus/store-mongo](./packages/store-mongo) | MongoDB |
+| [@saga-bus/store-dynamodb](./packages/store-dynamodb) | AWS DynamoDB |
+
+### Middleware
+
+| Package | Description |
+|---------|-------------|
+| [@saga-bus/middleware-logging](./packages/middleware-logging) | Structured logging |
+| [@saga-bus/middleware-tracing](./packages/middleware-tracing) | OpenTelemetry distributed tracing |
+| [@saga-bus/middleware-tenant](./packages/middleware-tenant) | Multi-tenant isolation |
+
+### Framework Integrations
+
+| Package | Description |
+|---------|-------------|
+| [@saga-bus/nestjs](./packages/nestjs) | NestJS module |
+| [@saga-bus/nextjs](./packages/nextjs) | Next.js helpers |
 
 ## Quick Start
 
@@ -73,7 +104,9 @@ await bus.publish({ type: "OrderSubmitted", orderId: "123" });
 
 ## Production Setup
 
-For production, use RabbitMQ and PostgreSQL:
+For production, use a durable transport and persistent store:
+
+### RabbitMQ + PostgreSQL
 
 ```typescript
 import { RabbitMqTransport } from "@saga-bus/transport-rabbitmq";
@@ -87,12 +120,67 @@ const bus = createBus({
   }),
   sagas: [{
     definition: orderSaga,
-    store: new PostgresSagaStore({
-      pool: pgPool,
-    }),
+    store: new PostgresSagaStore({ pool: pgPool }),
   }],
   middleware: [createLoggingMiddleware({ logger })],
 });
+```
+
+### AWS SQS + DynamoDB
+
+```typescript
+import { SqsTransport } from "@saga-bus/transport-sqs";
+import { DynamoDBSagaStore } from "@saga-bus/store-dynamodb";
+
+const bus = createBus({
+  transport: new SqsTransport({
+    client: sqsClient,
+    queueUrl: "https://sqs.../my-queue.fifo",
+  }),
+  sagas: [{
+    definition: orderSaga,
+    store: new DynamoDBSagaStore({
+      client: dynamoClient,
+      tableName: "saga-instances",
+    }),
+  }],
+});
+```
+
+### Kafka + MongoDB
+
+```typescript
+import { KafkaTransport } from "@saga-bus/transport-kafka";
+import { MongoSagaStore } from "@saga-bus/store-mongo";
+
+const bus = createBus({
+  transport: new KafkaTransport({
+    kafka: new Kafka({ brokers: ["localhost:9092"] }),
+    groupId: "my-app",
+  }),
+  sagas: [{
+    definition: orderSaga,
+    store: new MongoSagaStore({ db: mongoDb }),
+  }],
+});
+```
+
+## Testing
+
+Use the test harness for saga testing:
+
+```typescript
+import { TestHarness } from "@saga-bus/test";
+
+const harness = await TestHarness.create({
+  sagas: [{ definition: orderSaga, store: new InMemorySagaStore() }],
+});
+
+await harness.publish({ type: "OrderSubmitted", orderId: "123" });
+await harness.waitForIdle();
+
+const state = await harness.getSagaState("OrderSaga", "123");
+expect(state?.status).toBe("submitted");
 ```
 
 ## Development
