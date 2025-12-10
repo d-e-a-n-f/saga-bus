@@ -1,5 +1,5 @@
 {
-  "name": "@saga-bus/core",
+  "name": "@saga-bus/transport-inmemory",
   "version": "0.0.1",
   "type": "module",
   "main": "./dist/index.js",
@@ -21,6 +21,9 @@
     "test": "vitest run",
     "test:watch": "vitest"
   },
+  "dependencies": {
+    "@saga-bus/core": "workspace:*"
+  },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
@@ -30,6 +33,6 @@
     "vitest": "^3.0.0"
   },
   "peerDependencies": {
-    "typescript": ">=5.5.0"
+    "@saga-bus/core": ">=0.0.1"
   }
 }
