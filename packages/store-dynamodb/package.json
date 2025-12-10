@@ -1,0 +1,51 @@
+{
+  "name": "@saga-bus/store-dynamodb",
+  "version": "0.0.1",
+  "description": "DynamoDB saga store for saga-bus",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": ["dist", "README.md"],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/deanforan/saga-bus.git",
+    "directory": "packages/store-dynamodb"
+  },
+  "keywords": ["saga", "message-bus", "store", "dynamodb", "aws"],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint": "eslint src/",
+    "check-types": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@saga-bus/core": "workspace:*",
+    "@aws-sdk/client-dynamodb": "^3.600.0",
+    "@aws-sdk/lib-dynamodb": "^3.600.0"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@testcontainers/localstack": "^10.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.9.2",
+    "vitest": "^3.0.0"
+  },
+  "peerDependencies": {
+    "@aws-sdk/client-dynamodb": ">=3.0.0",
+    "@aws-sdk/lib-dynamodb": ">=3.0.0"
+  }
+}
