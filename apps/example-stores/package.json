@@ -1,0 +1,43 @@
+{
+  "name": "@saga-bus/example-stores",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "Example demonstrating different saga stores: PostgreSQL, MySQL, SQL Server, MongoDB, Redis",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "tsx src/index.ts",
+    "demo:postgres": "tsx src/postgres-demo.ts",
+    "demo:mysql": "tsx src/mysql-demo.ts",
+    "demo:sqlserver": "tsx src/sqlserver-demo.ts",
+    "demo:mongo": "tsx src/mongo-demo.ts",
+    "demo:redis": "tsx src/redis-demo.ts",
+    "build": "tsc",
+    "lint": "eslint src/"
+  },
+  "dependencies": {
+    "@saga-bus/core": "workspace:*",
+    "@saga-bus/examples-shared": "workspace:*",
+    "@saga-bus/transport-inmemory": "workspace:*",
+    "@saga-bus/store-postgres": "workspace:*",
+    "@saga-bus/store-mysql": "workspace:*",
+    "@saga-bus/store-sqlserver": "workspace:*",
+    "@saga-bus/store-mongo": "workspace:*",
+    "@saga-bus/store-redis": "workspace:*",
+    "@saga-bus/middleware-logging": "workspace:*",
+    "pg": "^8.16.0",
+    "mysql2": "^3.14.1",
+    "mssql": "^11.0.1",
+    "mongodb": "^6.16.0",
+    "ioredis": "^5.6.1"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "^20.0.0",
+    "@types/pg": "^8.11.6",
+    "@types/mssql": "^9.1.5",
+    "tsx": "^4.19.4",
+    "typescript": "^5.9.2"
+  }
+}

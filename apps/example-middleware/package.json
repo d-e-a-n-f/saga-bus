@@ -1,0 +1,37 @@
+{
+  "name": "@saga-bus/example-middleware",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "Example demonstrating full middleware stack: logging, tracing, metrics, validation, idempotency",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "tsx src/index.ts",
+    "build": "tsc",
+    "lint": "eslint src/"
+  },
+  "dependencies": {
+    "@saga-bus/core": "workspace:*",
+    "@saga-bus/examples-shared": "workspace:*",
+    "@saga-bus/transport-inmemory": "workspace:*",
+    "@saga-bus/store-inmemory": "workspace:*",
+    "@saga-bus/middleware-logging": "workspace:*",
+    "@saga-bus/middleware-tracing": "workspace:*",
+    "@saga-bus/middleware-metrics": "workspace:*",
+    "@saga-bus/middleware-idempotency": "workspace:*",
+    "@saga-bus/middleware-validation": "workspace:*",
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/sdk-node": "^0.56.0",
+    "@opentelemetry/sdk-trace-node": "^1.29.0",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.56.0",
+    "prom-client": "^15.1.3",
+    "zod": "^3.25.49"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "^20.0.0",
+    "tsx": "^4.19.4",
+    "typescript": "^5.9.2"
+  }
+}
