@@ -100,6 +100,31 @@ importers:
         specifier: ^3.0.0
         version: 3.2.4(@types/node@22.15.3)(jiti@2.6.1)(yaml@2.8.2)
 
+  packages/middleware-tenant:
+    dependencies:
+      '@saga-bus/core':
+        specifier: workspace:*
+        version: link:../core
+    devDependencies:
+      '@repo/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.26
+      tsup:
+        specifier: ^8.0.0
+        version: 8.5.1(jiti@2.6.1)(postcss@8.5.6)(typescript@5.9.2)(yaml@2.8.2)
+      typescript:
+        specifier: ^5.9.2
+        version: 5.9.2
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4(@types/node@20.19.26)(jiti@2.6.1)(yaml@2.8.2)
+
   packages/middleware-tracing:
     dependencies:
       '@saga-bus/core':
