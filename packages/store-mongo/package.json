@@ -1,0 +1,49 @@
+{
+  "name": "@saga-bus/store-mongo",
+  "version": "0.0.1",
+  "description": "MongoDB saga store for saga-bus",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": ["dist", "README.md"],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/deanforan/saga-bus.git",
+    "directory": "packages/store-mongo"
+  },
+  "keywords": ["saga", "message-bus", "store", "mongodb", "mongo"],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint": "eslint src/",
+    "check-types": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@saga-bus/core": "workspace:*",
+    "mongodb": "^6.8.0"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@testcontainers/mongodb": "^10.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.9.2",
+    "vitest": "^3.0.0"
+  },
+  "peerDependencies": {
+    "mongodb": ">=6.0.0"
+  }
+}
