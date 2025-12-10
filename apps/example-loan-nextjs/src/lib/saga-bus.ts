@@ -1,7 +1,7 @@
 import { Pool } from "pg";
 import { createBus, type Bus } from "@saga-bus/core";
 import { RabbitMqTransport } from "@saga-bus/transport-rabbitmq";
-import { PostgresSagaStore } from "@saga-bus/store-postgres";
+import { PostgresSagaStore, createSchema } from "@saga-bus/store-postgres";
 import { createLoggingMiddleware } from "@saga-bus/middleware-logging";
 import {
   LoanApplicationSaga,
@@ -43,8 +43,19 @@ const loggingMiddleware = createLoggingMiddleware({
 // Create bus
 let bus: Bus | null = null;
 let startPromise: Promise<void> | null = null;
+let schemaCreated = false;
+
+async function ensureSchema(): Promise<void> {
+  if (schemaCreated) return;
+  await createSchema(pool, { tableName: "loan_saga_instances" });
+  schemaCreated = true;
+  console.log("[INFO] Database schema ensured for loan_saga_instances");
+}
 
 export async function getSagaBus(): Promise<Bus> {
+  // Ensure schema exists before starting
+  await ensureSchema();
+
   if (!bus) {
     bus = createBus({
       transport,
@@ -66,6 +77,11 @@ export async function getSagaBus(): Promise<Bus> {
 
   await startPromise;
   return bus;
+}
+
+export async function getStoreWithSchema() {
+  await ensureSchema();
+  return store;
 }
 
 export function getStore() {

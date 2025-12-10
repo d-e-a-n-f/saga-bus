@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { getSagaBus, getStore } from "../../../lib/saga-bus";
+import { getSagaBus, getStoreWithSchema } from "../../../lib/saga-bus";
 import type { LoanApplicationSubmitted } from "@saga-bus/examples-shared";
 import { randomUUID } from "crypto";
 
 export async function GET() {
-  const store = getStore();
+  const store = await getStoreWithSchema();
 
   // Get all loan applications from store using PostgreSQL query
   const allStates = await store.findByName("LoanApplicationSaga", {
