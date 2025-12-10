@@ -38,6 +38,11 @@ export {
   ValidationError,
 } from "./errors/index.js";
 
-// Functions will be added in later phases:
-// - createBus (Phase 5)
-// - createSagaMachine (Phase 4)
+// DSL
+export { createSagaMachine, SagaMachineBuilder } from "./dsl/index.js";
+export type {
+  CorrelateOptions,
+  SagaHandler,
+  StateGuard,
+  InitialStateFactory,
+} from "./dsl/index.js";
