@@ -79,19 +79,7 @@ export async function getSagaBus(): Promise<Bus> {
   return bus;
 }
 
-export async function getStoreWithSchema() {
+export async function getStore() {
   await ensureSchema();
   return store;
-}
-
-export function getStore() {
-  return store;
-}
-
-export function getTransport() {
-  return transport;
-}
-
-export function getPool() {
-  return pool;
 }
