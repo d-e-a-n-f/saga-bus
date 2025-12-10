@@ -1,6 +1,7 @@
 {
   "name": "@saga-bus/test",
   "version": "0.0.1",
+  "description": "Testing utilities for saga-bus applications",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -12,7 +13,20 @@
       "require": "./dist/index.cjs"
     }
   },
-  "files": ["dist"],
+  "files": ["dist", "README.md"],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/deanforan/saga-bus.git",
+    "directory": "packages/test"
+  },
+  "bugs": {
+    "url": "https://github.com/deanforan/saga-bus/issues"
+  },
+  "homepage": "https://github.com/deanforan/saga-bus#readme",
+  "keywords": ["saga", "message-bus", "testing", "test-harness"],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",

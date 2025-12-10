@@ -1,6 +1,7 @@
 {
   "name": "@saga-bus/store-inmemory",
   "version": "0.0.1",
+  "description": "In-memory saga store for saga-bus testing and development",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -12,7 +13,20 @@
       "require": "./dist/index.cjs"
     }
   },
-  "files": ["dist"],
+  "files": ["dist", "README.md"],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/deanforan/saga-bus.git",
+    "directory": "packages/store-inmemory"
+  },
+  "bugs": {
+    "url": "https://github.com/deanforan/saga-bus/issues"
+  },
+  "homepage": "https://github.com/deanforan/saga-bus#readme",
+  "keywords": ["saga", "message-bus", "store", "inmemory", "testing"],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",

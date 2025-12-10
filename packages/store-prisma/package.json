@@ -1,6 +1,7 @@
 {
   "name": "@saga-bus/store-prisma",
   "version": "0.0.1",
+  "description": "Prisma ORM adapter for saga-bus state storage",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -12,7 +13,20 @@
       "require": "./dist/index.cjs"
     }
   },
-  "files": ["dist", "prisma"],
+  "files": ["dist", "prisma", "README.md"],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/deanforan/saga-bus.git",
+    "directory": "packages/store-prisma"
+  },
+  "bugs": {
+    "url": "https://github.com/deanforan/saga-bus/issues"
+  },
+  "homepage": "https://github.com/deanforan/saga-bus#readme",
+  "keywords": ["saga", "message-bus", "store", "prisma", "orm"],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
