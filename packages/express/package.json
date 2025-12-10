@@ -1,0 +1,54 @@
+{
+  "name": "@saga-bus/express",
+  "version": "0.0.1",
+  "description": "Express.js integration for saga-bus",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": ["dist", "README.md"],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/deanforan/saga-bus.git",
+    "directory": "packages/express"
+  },
+  "bugs": {
+    "url": "https://github.com/deanforan/saga-bus/issues"
+  },
+  "homepage": "https://github.com/deanforan/saga-bus#readme",
+  "keywords": ["saga", "message-bus", "express", "middleware", "integration"],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint": "eslint src/",
+    "check-types": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@saga-bus/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@types/express": "^4.17.21",
+    "express": "^4.21.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.9.2",
+    "vitest": "^3.0.0"
+  },
+  "peerDependencies": {
+    "@saga-bus/core": ">=0.0.1",
+    "express": ">=4.0.0"
+  }
+}
