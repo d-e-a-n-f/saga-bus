@@ -6,10 +6,11 @@ A MassTransit-style saga orchestration library for TypeScript/Node.js.
 
 - **Type-Safe Sagas**: Full TypeScript support with fluent DSL
 - **Message-Driven**: Publish/subscribe with correlation
-- **Pluggable Storage**: In-memory, PostgreSQL, MongoDB, DynamoDB, or Prisma
-- **Pluggable Transport**: In-memory, RabbitMQ, SQS, or Kafka
-- **Middleware Pipeline**: Logging, tracing, multi-tenancy
-- **Framework Integrations**: NestJS and Next.js support
+- **Saga Timeouts**: Built-in timeout tracking and expiration
+- **Pluggable Storage**: In-memory, PostgreSQL, MySQL, SQL Server, MongoDB, DynamoDB, Redis, or Prisma
+- **Pluggable Transport**: In-memory, RabbitMQ, Kafka, SQS, Azure Service Bus, GCP Pub/Sub, Redis Streams, or NATS
+- **Middleware Pipeline**: Logging, tracing, metrics, validation, idempotency, multi-tenancy
+- **Framework Integrations**: NestJS, Next.js, Express, Fastify, and Hono
 - **Testing First**: Built-in test harness
 
 ## Packages
@@ -26,9 +27,13 @@ A MassTransit-style saga orchestration library for TypeScript/Node.js.
 | Package | Description |
 |---------|-------------|
 | [@saga-bus/transport-inmemory](./packages/transport-inmemory) | In-memory transport for testing |
-| [@saga-bus/transport-rabbitmq](./packages/transport-rabbitmq) | RabbitMQ for production |
+| [@saga-bus/transport-rabbitmq](./packages/transport-rabbitmq) | RabbitMQ with topic exchanges |
+| [@saga-bus/transport-kafka](./packages/transport-kafka) | Apache Kafka with consumer groups |
 | [@saga-bus/transport-sqs](./packages/transport-sqs) | AWS SQS FIFO queues |
-| [@saga-bus/transport-kafka](./packages/transport-kafka) | Apache Kafka |
+| [@saga-bus/transport-azure-servicebus](./packages/transport-azure-servicebus) | Azure Service Bus with sessions |
+| [@saga-bus/transport-gcp-pubsub](./packages/transport-gcp-pubsub) | Google Cloud Pub/Sub |
+| [@saga-bus/transport-redis](./packages/transport-redis) | Redis Streams with consumer groups |
+| [@saga-bus/transport-nats](./packages/transport-nats) | NATS JetStream |
 
 ### Stores
 
@@ -36,9 +41,12 @@ A MassTransit-style saga orchestration library for TypeScript/Node.js.
 |---------|-------------|
 | [@saga-bus/store-inmemory](./packages/store-inmemory) | In-memory store for testing |
 | [@saga-bus/store-postgres](./packages/store-postgres) | PostgreSQL with pg driver |
-| [@saga-bus/store-prisma](./packages/store-prisma) | Prisma ORM adapter |
+| [@saga-bus/store-mysql](./packages/store-mysql) | MySQL/MariaDB with mysql2 |
+| [@saga-bus/store-sqlserver](./packages/store-sqlserver) | SQL Server/Azure SQL with mssql |
 | [@saga-bus/store-mongo](./packages/store-mongo) | MongoDB |
 | [@saga-bus/store-dynamodb](./packages/store-dynamodb) | AWS DynamoDB |
+| [@saga-bus/store-redis](./packages/store-redis) | Redis with TTL support |
+| [@saga-bus/store-prisma](./packages/store-prisma) | Prisma ORM adapter |
 
 ### Middleware
 
@@ -46,14 +54,20 @@ A MassTransit-style saga orchestration library for TypeScript/Node.js.
 |---------|-------------|
 | [@saga-bus/middleware-logging](./packages/middleware-logging) | Structured logging |
 | [@saga-bus/middleware-tracing](./packages/middleware-tracing) | OpenTelemetry distributed tracing |
+| [@saga-bus/middleware-metrics](./packages/middleware-metrics) | Prometheus metrics |
+| [@saga-bus/middleware-validation](./packages/middleware-validation) | Zod schema validation |
+| [@saga-bus/middleware-idempotency](./packages/middleware-idempotency) | Message deduplication |
 | [@saga-bus/middleware-tenant](./packages/middleware-tenant) | Multi-tenant isolation |
 
 ### Framework Integrations
 
 | Package | Description |
 |---------|-------------|
-| [@saga-bus/nestjs](./packages/nestjs) | NestJS module |
-| [@saga-bus/nextjs](./packages/nextjs) | Next.js helpers |
+| [@saga-bus/nestjs](./packages/nestjs) | NestJS module with DI |
+| [@saga-bus/nextjs](./packages/nextjs) | Next.js App Router helpers |
+| [@saga-bus/express](./packages/express) | Express middleware and routers |
+| [@saga-bus/fastify](./packages/fastify) | Fastify plugin |
+| [@saga-bus/hono](./packages/hono) | Hono middleware (edge runtimes) |
 
 ## Quick Start
 
@@ -206,26 +220,33 @@ expect(state?.status).toBe("submitted");
 
 ## Examples
 
-See the [examples](./examples) directory for complete working applications:
+See the [apps](./apps) directory for complete working applications:
 
-| Example | Pattern | Description |
-|---------|---------|-------------|
-| [example-worker](./apps/example-worker) | Background Worker | Standalone saga processor with health/metrics |
-| [example-nextjs](./apps/example-nextjs) | Message Producer | Next.js UI that publishes to RabbitMQ |
-| [example-nestjs](./apps/example-nestjs) | Monolith | Full NestJS API with Swagger docs |
+| Example | Description |
+|---------|-------------|
+| [example-worker](./apps/example-worker) | Standalone saga processor with health/metrics endpoints |
+| [example-nextjs](./apps/example-nextjs) | Next.js UI for order submission (RabbitMQ + PostgreSQL) |
+| [example-nestjs](./apps/example-nestjs) | Full NestJS API with Swagger docs |
+| [example-loan-nextjs](./apps/example-loan-nextjs) | Complex 30+ state loan application saga with Next.js UI |
+| [example-redis](./apps/example-redis) | Redis Streams transport + Redis store demo |
+| [example-stores](./apps/example-stores) | Database store demos (PostgreSQL, MySQL, SQL Server, MongoDB, Redis) |
+| [example-middleware](./apps/example-middleware) | Full middleware stack (tracing, metrics, validation, idempotency) |
 
 ### Quick Start
 
 ```bash
-cd examples
+# Start infrastructure
 docker-compose up -d
+
+# Run the loan application example
+cd apps/example-loan-nextjs
+pnpm dev
 
 # UIs available at:
 # - http://localhost:3001   Next.js order form
-# - http://localhost:3002/api   NestJS Swagger
-# - http://localhost:15672   RabbitMQ Management
-# - http://localhost:16686   Jaeger Tracing
-# - http://localhost:3003   Grafana Dashboards
+# - http://localhost:3002   Loan application UI
+# - http://localhost:15672  RabbitMQ Management
+# - http://localhost:16686  Jaeger Tracing
 ```
 
 ## Development
