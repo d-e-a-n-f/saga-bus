@@ -34,11 +34,40 @@ const orderSaga = createSagaMachine<OrderState, OrderMessages>()
 // Create and start the bus
 const bus = createBus({
   transport: new InMemoryTransport(),
-  sagas: [{ definition: orderSaga, store: new InMemorySagaStore() }],
+  store: new InMemorySagaStore(), // shared across all sagas
+  sagas: [{ definition: orderSaga }],
 });
 
 await bus.start();
 await bus.publish({ type: "OrderSubmitted", orderId: "123" });
+```
+
+## Store Configuration
+
+You can configure stores in two ways:
+
+**Shared store (recommended):**
+```typescript
+const bus = createBus({
+  transport,
+  store: new PostgresSagaStore({ pool }), // used by all sagas
+  sagas: [
+    { definition: orderSaga },
+    { definition: paymentSaga },
+  ],
+});
+```
+
+**Per-saga stores (with override):**
+```typescript
+const bus = createBus({
+  transport,
+  store: new PostgresSagaStore({ pool }), // default
+  sagas: [
+    { definition: orderSaga },                     // uses default
+    { definition: auditSaga, store: auditStore }, // override
+  ],
+});
 ```
 
 ## Exports

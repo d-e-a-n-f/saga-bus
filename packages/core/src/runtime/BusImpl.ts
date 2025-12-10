@@ -51,9 +51,18 @@ export class BusImpl implements Bus {
 
     // Create orchestrators for each registered saga
     this.orchestrators = config.sagas.map((registration) => {
+      // Resolve store: per-saga store takes precedence over default store
+      const store = registration.store ?? config.store;
+      if (!store) {
+        throw new Error(
+          `Saga "${registration.definition.name}" has no store. ` +
+            `Provide a store in the saga registration or set a default store in BusConfig.`
+        );
+      }
+
       return new SagaOrchestrator({
         definition: registration.definition,
-        store: registration.store,
+        store,
         transport: config.transport,
         pipeline: this.pipeline,
         logger: this.logger,

@@ -22,8 +22,14 @@ export interface TestHarnessOptions<
   sagas: SagaDefinition<TState, TMessages>[];
 
   /**
+   * Optional shared store for all sagas.
+   * If not provided, an InMemorySagaStore is created per saga.
+   */
+  store?: SagaStore<TState>;
+
+  /**
    * Optional custom stores per saga (by name).
-   * If not provided, an InMemorySagaStore is created.
+   * Takes precedence over the shared store.
    */
   stores?: Record<string, SagaStore<TState>>;
 }
@@ -82,13 +88,30 @@ export class TestHarness<
     const transport = new InMemoryTransport({ defaultConcurrency: 1 });
     const stores = new Map<string, InMemorySagaStore<TState>>();
 
+    // Track shared store for getSagaState lookups
+    let sharedStoreInstance: InMemorySagaStore<TState> | undefined;
+    if (options.store && options.store instanceof InMemorySagaStore) {
+      sharedStoreInstance = options.store;
+    }
+
     // Create registrations
+    // Priority: per-saga store > shared store > auto-create InMemory
     const registrations = options.sagas.map((definition) => {
-      // Use provided store or create new one
       let store: SagaStore<TState>;
       if (options.stores?.[definition.name]) {
+        // Per-saga store override
         store = options.stores[definition.name]!;
+        if (store instanceof InMemorySagaStore) {
+          stores.set(definition.name, store);
+        }
+      } else if (options.store) {
+        // Shared store
+        store = options.store;
+        if (sharedStoreInstance) {
+          stores.set(definition.name, sharedStoreInstance);
+        }
       } else {
+        // Auto-create InMemory store
         const memStore = new InMemorySagaStore<TState>();
         stores.set(definition.name, memStore);
         store = memStore;

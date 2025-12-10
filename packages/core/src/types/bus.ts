@@ -12,7 +12,8 @@ export interface SagaRegistration<
   TMessageUnion extends BaseMessage
 > {
   readonly definition: SagaDefinition<TState, TMessageUnion>;
-  readonly store: SagaStore<TState>;
+  /** Store for this saga. If not provided, uses the default store from BusConfig. */
+  readonly store?: SagaStore<TState>;
 }
 
 /**
@@ -57,6 +58,8 @@ export interface WorkerConfig {
 export interface BusConfig {
   /** Transport implementation */
   readonly transport: Transport;
+  /** Default store for all sagas. Can be overridden per-saga in the registration. */
+  readonly store?: SagaStore<SagaState>;
   /** Registered sagas */
   readonly sagas: ReadonlyArray<SagaRegistration<SagaState, BaseMessage>>;
   /** Middleware pipeline */

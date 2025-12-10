@@ -407,4 +407,151 @@ describe("BusImpl", () => {
 
     await bus.stop();
   });
+
+  describe("shared store", () => {
+    it("should use shared store for all sagas when no per-saga store provided", async () => {
+      const sharedStore = new MockStore<OrderState>();
+
+      const saga1 = createSagaMachine<OrderState, OrderMessages>()
+        .name("OrderSaga1")
+        .correlate("OrderSubmitted", (msg) => msg.orderId, { canStart: true })
+        .initial<OrderSubmitted>((msg, ctx) => ({
+          metadata: {
+            sagaId: ctx.sagaId,
+            version: 0,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            isCompleted: false,
+          },
+          orderId: msg.orderId,
+          status: "submitted",
+        }))
+        .build();
+
+      const saga2 = createSagaMachine<OrderState, OrderMessages>()
+        .name("OrderSaga2")
+        .correlate("OrderSubmitted", (msg) => msg.orderId, { canStart: true })
+        .initial<OrderSubmitted>((msg, ctx) => ({
+          metadata: {
+            sagaId: ctx.sagaId,
+            version: 0,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            isCompleted: false,
+          },
+          orderId: msg.orderId,
+          status: "submitted",
+        }))
+        .build();
+
+      const bus = createBus({
+        transport: transport as never,
+        store: sharedStore as never,
+        sagas: [{ definition: saga1 }, { definition: saga2 }],
+        logger: silentLogger,
+      });
+
+      await bus.start();
+      await bus.publish({ type: "OrderSubmitted", orderId: "order-123" });
+
+      // Both sagas should have created instances in the shared store
+      const state1 = await sharedStore.getByCorrelationId("OrderSaga1", "order-123");
+      const state2 = await sharedStore.getByCorrelationId("OrderSaga2", "order-123");
+
+      expect(state1).not.toBeNull();
+      expect(state1?.orderId).toBe("order-123");
+      expect(state2).not.toBeNull();
+      expect(state2?.orderId).toBe("order-123");
+
+      await bus.stop();
+    });
+
+    it("should allow per-saga store override with shared default", async () => {
+      const sharedStore = new MockStore<OrderState>();
+      const dedicatedStore = new MockStore<OrderState>();
+
+      const saga1 = createSagaMachine<OrderState, OrderMessages>()
+        .name("OrderSaga1")
+        .correlate("OrderSubmitted", (msg) => msg.orderId, { canStart: true })
+        .initial<OrderSubmitted>((msg, ctx) => ({
+          metadata: {
+            sagaId: ctx.sagaId,
+            version: 0,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            isCompleted: false,
+          },
+          orderId: msg.orderId,
+          status: "submitted",
+        }))
+        .build();
+
+      const saga2 = createSagaMachine<OrderState, OrderMessages>()
+        .name("OrderSaga2")
+        .correlate("OrderSubmitted", (msg) => msg.orderId, { canStart: true })
+        .initial<OrderSubmitted>((msg, ctx) => ({
+          metadata: {
+            sagaId: ctx.sagaId,
+            version: 0,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            isCompleted: false,
+          },
+          orderId: msg.orderId,
+          status: "submitted",
+        }))
+        .build();
+
+      const bus = createBus({
+        transport: transport as never,
+        store: sharedStore as never,
+        sagas: [
+          { definition: saga1 }, // uses sharedStore
+          { definition: saga2, store: dedicatedStore as never }, // override
+        ],
+        logger: silentLogger,
+      });
+
+      await bus.start();
+      await bus.publish({ type: "OrderSubmitted", orderId: "order-123" });
+
+      // saga1 should be in sharedStore
+      const state1 = await sharedStore.getByCorrelationId("OrderSaga1", "order-123");
+      expect(state1).not.toBeNull();
+
+      // saga2 should be in dedicatedStore, not sharedStore
+      const state2InShared = await sharedStore.getByCorrelationId("OrderSaga2", "order-123");
+      const state2InDedicated = await dedicatedStore.getByCorrelationId("OrderSaga2", "order-123");
+      expect(state2InShared).toBeNull();
+      expect(state2InDedicated).not.toBeNull();
+
+      await bus.stop();
+    });
+
+    it("should throw error when saga has no store and no default store", () => {
+      const saga = createSagaMachine<OrderState, OrderMessages>()
+        .name("OrderSaga")
+        .correlate("OrderSubmitted", (msg) => msg.orderId, { canStart: true })
+        .initial<OrderSubmitted>((msg, ctx) => ({
+          metadata: {
+            sagaId: ctx.sagaId,
+            version: 0,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            isCompleted: false,
+          },
+          orderId: msg.orderId,
+          status: "submitted",
+        }))
+        .build();
+
+      expect(() =>
+        createBus({
+          transport: transport as never,
+          sagas: [{ definition: saga }], // no store!
+          logger: silentLogger,
+        })
+      ).toThrow(/no store/i);
+    });
+  });
 });

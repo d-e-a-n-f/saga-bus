@@ -113,15 +113,20 @@ import { RabbitMqTransport } from "@saga-bus/transport-rabbitmq";
 import { PostgresSagaStore } from "@saga-bus/store-postgres";
 import { createLoggingMiddleware } from "@saga-bus/middleware-logging";
 
+// Single store shared across all sagas
+const store = new PostgresSagaStore({ pool: pgPool });
+
 const bus = createBus({
   transport: new RabbitMqTransport({
     uri: process.env.RABBITMQ_URL!,
     exchange: "saga-bus",
   }),
-  sagas: [{
-    definition: orderSaga,
-    store: new PostgresSagaStore({ pool: pgPool }),
-  }],
+  store, // shared across all sagas
+  sagas: [
+    { definition: orderSaga },
+    { definition: paymentSaga },
+    { definition: shippingSaga },
+  ],
   middleware: [createLoggingMiddleware({ logger })],
 });
 ```
@@ -132,18 +137,18 @@ const bus = createBus({
 import { SqsTransport } from "@saga-bus/transport-sqs";
 import { DynamoDBSagaStore } from "@saga-bus/store-dynamodb";
 
+const store = new DynamoDBSagaStore({
+  client: dynamoClient,
+  tableName: "saga-instances",
+});
+
 const bus = createBus({
   transport: new SqsTransport({
     client: sqsClient,
     queueUrl: "https://sqs.../my-queue.fifo",
   }),
-  sagas: [{
-    definition: orderSaga,
-    store: new DynamoDBSagaStore({
-      client: dynamoClient,
-      tableName: "saga-instances",
-    }),
-  }],
+  store,
+  sagas: [{ definition: orderSaga }, { definition: paymentSaga }],
 });
 ```
 
@@ -153,15 +158,31 @@ const bus = createBus({
 import { KafkaTransport } from "@saga-bus/transport-kafka";
 import { MongoSagaStore } from "@saga-bus/store-mongo";
 
+const store = new MongoSagaStore({ db: mongoDb });
+
 const bus = createBus({
   transport: new KafkaTransport({
     kafka: new Kafka({ brokers: ["localhost:9092"] }),
     groupId: "my-app",
   }),
-  sagas: [{
-    definition: orderSaga,
-    store: new MongoSagaStore({ db: mongoDb }),
-  }],
+  store,
+  sagas: [{ definition: orderSaga }, { definition: paymentSaga }],
+});
+```
+
+### Per-Saga Store Override
+
+If specific sagas need a different store, you can override at the saga level:
+
+```typescript
+const bus = createBus({
+  transport,
+  store: new PostgresSagaStore({ pool }), // default for all sagas
+  sagas: [
+    { definition: orderSaga },                        // uses default store
+    { definition: paymentSaga },                      // uses default store
+    { definition: auditSaga, store: auditOnlyStore }, // override with dedicated store
+  ],
 });
 ```
 

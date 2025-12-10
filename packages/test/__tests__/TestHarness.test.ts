@@ -370,5 +370,77 @@ describe("TestHarness", () => {
 
       await combinedHarness.stop();
     });
+
+    it("should use shared store for multiple sagas", async () => {
+      const { InMemorySagaStore } = await import("@saga-bus/store-inmemory");
+      const sharedStore = new InMemorySagaStore<OrderState | InventoryState>();
+
+      const combinedHarness = await TestHarness.create<
+        OrderState | InventoryState,
+        OrderMessages | InventoryMessages
+      >({
+        sagas: [orderSaga as never, inventorySaga as never],
+        store: sharedStore,
+      });
+
+      await combinedHarness.publish({
+        type: "OrderSubmitted",
+        orderId: "order-123",
+        customerId: "customer-456",
+      });
+
+      // Both sagas should have been created in the same store
+      const orderState = await combinedHarness.getSagaState(
+        "OrderSaga",
+        "order-123"
+      );
+      const inventoryState = await combinedHarness.getSagaState(
+        "InventorySaga",
+        "order-123"
+      );
+
+      expect(orderState).not.toBeNull();
+      expect(inventoryState).not.toBeNull();
+
+      // Verify both are in the shared store
+      const allStates = sharedStore.getAll();
+      expect(allStates).toHaveLength(2);
+
+      await combinedHarness.stop();
+    });
+
+    it("should allow per-saga store override with shared default", async () => {
+      const { InMemorySagaStore } = await import("@saga-bus/store-inmemory");
+      const sharedStore = new InMemorySagaStore<OrderState | InventoryState>();
+      const dedicatedStore = new InMemorySagaStore<InventoryState>();
+
+      const combinedHarness = await TestHarness.create<
+        OrderState | InventoryState,
+        OrderMessages | InventoryMessages
+      >({
+        sagas: [orderSaga as never, inventorySaga as never],
+        store: sharedStore,
+        stores: {
+          InventorySaga: dedicatedStore,
+        },
+      });
+
+      await combinedHarness.publish({
+        type: "OrderSubmitted",
+        orderId: "order-123",
+        customerId: "customer-456",
+      });
+
+      // OrderSaga should be in sharedStore
+      const orderStatesInShared = sharedStore.getAll();
+      expect(orderStatesInShared.some((s) => "customerId" in s)).toBe(true);
+
+      // InventorySaga should be in dedicatedStore
+      const inventoryStatesInDedicated = dedicatedStore.getAll();
+      expect(inventoryStatesInDedicated).toHaveLength(1);
+      expect(inventoryStatesInDedicated[0]?.orderId).toBe("order-123");
+
+      await combinedHarness.stop();
+    });
   });
 });
