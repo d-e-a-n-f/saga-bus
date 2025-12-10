@@ -103,6 +103,15 @@ export class TestHarness<
     const bus = createBus({
       transport,
       sagas: registrations,
+      // Disable retries in tests - fail fast, surface errors immediately
+      worker: {
+        retryPolicy: {
+          maxAttempts: 1,
+          baseDelayMs: 0,
+          maxDelayMs: 0,
+          backoff: "linear",
+        },
+      },
     });
 
     const harness = new TestHarness<TState, TMessages>(bus, transport, stores);
