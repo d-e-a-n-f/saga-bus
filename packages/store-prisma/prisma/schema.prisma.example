@@ -1,0 +1,37 @@
+// This is an example schema for saga-bus.
+// Copy this to your project's schema.prisma and run `prisma migrate`.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model SagaInstance {
+  id            String   @db.VarChar(128)
+  sagaName      String   @map("saga_name") @db.VarChar(128)
+  correlationId String   @map("correlation_id") @db.VarChar(256)
+  version       Int
+  isCompleted   Boolean  @default(false) @map("is_completed")
+  state         Json
+
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  // Composite primary key for isolation between saga types
+  @@id([sagaName, id])
+
+  // Index for correlation ID lookups
+  @@unique([sagaName, correlationId])
+
+  // Index for finding incomplete sagas
+  @@index([sagaName, isCompleted])
+
+  // Index for cleanup queries
+  @@index([sagaName, isCompleted, updatedAt])
+
+  @@map("saga_instances")
+}
