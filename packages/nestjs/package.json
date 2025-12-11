@@ -1,6 +1,6 @@
 {
   "name": "@saga-bus/nestjs",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "NestJS module for saga-bus",
   "type": "module",
   "main": "./dist/index.cjs",

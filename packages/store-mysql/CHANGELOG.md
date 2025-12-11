@@ -1,5 +1,14 @@
 # @saga-bus/store-mysql
 
+## 0.1.1
+
+### Patch Changes
+
+- Fix package metadata - correct repository URLs and normalize versions.
+
+- Updated dependencies []:
+  - @saga-bus/core@0.1.1
+
 ## 1.0.0
 
 ### Minor Changes

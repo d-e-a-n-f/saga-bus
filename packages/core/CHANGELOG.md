@@ -1,5 +1,11 @@
 # @saga-bus/core
 
+## 0.1.1
+
+### Patch Changes
+
+- Fix package metadata - correct repository URLs and normalize versions.
+
 ## 0.1.0
 
 ### Minor Changes

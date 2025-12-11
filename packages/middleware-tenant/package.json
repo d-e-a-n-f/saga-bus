@@ -1,6 +1,6 @@
 {
   "name": "@saga-bus/middleware-tenant",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Multi-tenant middleware for saga-bus",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -52,6 +52,6 @@
     "vitest": "^3.0.0"
   },
   "peerDependencies": {
-    "@saga-bus/core": ">=0.1.0"
+    "@saga-bus/core": ">=0.1.1"
   }
 }

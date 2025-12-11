@@ -1,6 +1,6 @@
 {
   "name": "@saga-bus/store-postgres",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "PostgreSQL saga store for saga-bus using native pg driver",
   "type": "module",
   "main": "./dist/index.js",
@@ -58,7 +58,7 @@
     "vitest": "^3.0.0"
   },
   "peerDependencies": {
-    "@saga-bus/core": ">=0.1.0",
+    "@saga-bus/core": ">=0.1.1",
     "pg": ">=8.0.0"
   }
 }

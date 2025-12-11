@@ -1,6 +1,6 @@
 {
   "name": "@saga-bus/middleware-metrics",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Prometheus metrics middleware for saga-bus",
   "type": "module",
   "main": "./dist/index.js",
@@ -57,7 +57,7 @@
     "vitest": "^3.0.0"
   },
   "peerDependencies": {
-    "@saga-bus/core": ">=0.1.0",
+    "@saga-bus/core": ">=0.1.1",
     "prom-client": ">=14.0.0"
   }
 }
