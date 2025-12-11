@@ -22,13 +22,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/deanforan/saga-bus.git",
+    "url": "https://github.com/d-e-a-n-f/saga-bus.git",
     "directory": "packages/core"
   },
   "bugs": {
-    "url": "https://github.com/deanforan/saga-bus/issues"
+    "url": "https://github.com/d-e-a-n-f/saga-bus/issues"
   },
-  "homepage": "https://github.com/deanforan/saga-bus#readme",
+  "homepage": "https://github.com/d-e-a-n-f/saga-bus#readme",
   "keywords": [
     "saga",
     "message-bus",

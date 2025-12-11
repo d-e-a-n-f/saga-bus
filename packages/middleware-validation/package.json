@@ -57,5 +57,14 @@
     "schema",
     "event-sourcing"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/d-e-a-n-f/saga-bus.git",
+    "directory": "packages/middleware-validation"
+  },
+  "bugs": {
+    "url": "https://github.com/d-e-a-n-f/saga-bus/issues"
+  },
+  "homepage": "https://github.com/d-e-a-n-f/saga-bus#readme"
 }

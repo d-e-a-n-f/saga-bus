@@ -1,6 +1,6 @@
 {
   "name": "@saga-bus/middleware-tenant",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Multi-tenant middleware for saga-bus",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -22,7 +22,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/deanforan/saga-bus.git",
+    "url": "https://github.com/d-e-a-n-f/saga-bus.git",
     "directory": "packages/middleware-tenant"
   },
   "keywords": [
