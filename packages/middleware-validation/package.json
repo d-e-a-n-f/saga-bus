@@ -1,6 +1,6 @@
 {
   "name": "@saga-bus/middleware-validation",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Validation middleware for saga-bus message payload validation",
   "type": "module",
   "main": "./dist/index.js",

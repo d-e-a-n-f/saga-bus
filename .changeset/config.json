@@ -6,15 +6,22 @@
   ],
   "commit": false,
   "fixed": [],
-  "linked": [
-    ["@saga-bus/*"]
-  ],
+  "linked": [],
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
   "ignore": [
-    "@repo/eslint-config",
-    "@repo/typescript-config",
+    "@saga-bus/example-loan-nextjs",
+    "@saga-bus/example-middleware",
+    "@saga-bus/example-nestjs",
+    "@saga-bus/example-nextjs",
+    "@saga-bus/example-redis",
+    "@saga-bus/example-stores",
+    "@saga-bus/example-worker",
     "@saga-bus/examples-shared"
-  ]
+  ],
+  "privatePackages": {
+    "version": false,
+    "tag": false
+  }
 }

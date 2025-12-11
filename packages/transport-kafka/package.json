@@ -1,6 +1,6 @@
 {
   "name": "@saga-bus/transport-kafka",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Kafka transport for saga-bus",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -13,7 +13,10 @@
       "require": "./dist/index.cjs"
     }
   },
-  "files": ["dist", "README.md"],
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "publishConfig": {
     "access": "public"
   },
@@ -22,7 +25,13 @@
     "url": "https://github.com/deanforan/saga-bus.git",
     "directory": "packages/transport-kafka"
   },
-  "keywords": ["saga", "message-bus", "transport", "kafka", "kafkajs"],
+  "keywords": [
+    "saga",
+    "message-bus",
+    "transport",
+    "kafka",
+    "kafkajs"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",

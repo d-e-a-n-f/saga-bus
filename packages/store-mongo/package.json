@@ -1,6 +1,6 @@
 {
   "name": "@saga-bus/store-mongo",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "MongoDB saga store for saga-bus",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -13,7 +13,10 @@
       "require": "./dist/index.cjs"
     }
   },
-  "files": ["dist", "README.md"],
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "publishConfig": {
     "access": "public"
   },
@@ -22,7 +25,13 @@
     "url": "https://github.com/deanforan/saga-bus.git",
     "directory": "packages/store-mongo"
   },
-  "keywords": ["saga", "message-bus", "store", "mongodb", "mongo"],
+  "keywords": [
+    "saga",
+    "message-bus",
+    "store",
+    "mongodb",
+    "mongo"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",

@@ -1,6 +1,6 @@
 {
   "name": "@saga-bus/middleware-logging",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Structured logging middleware for saga-bus",
   "type": "module",
   "main": "./dist/index.js",
@@ -13,7 +13,10 @@
       "require": "./dist/index.cjs"
     }
   },
-  "files": ["dist", "README.md"],
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "publishConfig": {
     "access": "public"
   },
@@ -26,7 +29,13 @@
     "url": "https://github.com/deanforan/saga-bus/issues"
   },
   "homepage": "https://github.com/deanforan/saga-bus#readme",
-  "keywords": ["saga", "message-bus", "middleware", "logging", "observability"],
+  "keywords": [
+    "saga",
+    "message-bus",
+    "middleware",
+    "logging",
+    "observability"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
@@ -46,6 +55,6 @@
     "vitest": "^3.0.0"
   },
   "peerDependencies": {
-    "@saga-bus/core": ">=0.0.1"
+    "@saga-bus/core": ">=0.1.0"
   }
 }

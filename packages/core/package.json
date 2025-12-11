@@ -1,6 +1,6 @@
 {
   "name": "@saga-bus/core",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Core types, DSL, and runtime for saga-bus message orchestration",
   "type": "module",
   "main": "./dist/index.js",
@@ -13,7 +13,10 @@
       "require": "./dist/index.cjs"
     }
   },
-  "files": ["dist", "README.md"],
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "publishConfig": {
     "access": "public"
   },
@@ -26,7 +29,13 @@
     "url": "https://github.com/deanforan/saga-bus/issues"
   },
   "homepage": "https://github.com/deanforan/saga-bus#readme",
-  "keywords": ["saga", "message-bus", "orchestration", "state-machine", "typescript"],
+  "keywords": [
+    "saga",
+    "message-bus",
+    "orchestration",
+    "state-machine",
+    "typescript"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
