@@ -249,6 +249,111 @@ pnpm dev
 # - http://localhost:16686  Jaeger Tracing
 ```
 
+## Operational Defaults
+
+The bus uses sensible defaults that can be overridden via configuration:
+
+### Retry Policy
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `maxAttempts` | 3 | Total attempts before sending to DLQ |
+| `baseDelayMs` | 1000 | Initial retry delay (1 second) |
+| `maxDelayMs` | 30000 | Maximum retry delay (30 seconds) |
+| `backoff` | `"exponential"` | Backoff strategy (`"exponential"` or `"linear"`) |
+
+With exponential backoff, delays are: 1s → 2s → 4s → 8s → ... (capped at `maxDelayMs`).
+
+### Dead Letter Queue (DLQ)
+
+Failed messages (after max retries) are sent to a DLQ named `{endpoint}.dlq` by default.
+
+```typescript
+const bus = createBus({
+  // ...
+  worker: {
+    dlqNaming: (endpoint) => `${endpoint}.dead-letter`, // custom naming
+  },
+});
+```
+
+### Worker Concurrency
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `defaultConcurrency` | 1 | Messages processed concurrently per endpoint |
+
+```typescript
+const bus = createBus({
+  // ...
+  worker: {
+    defaultConcurrency: 5, // process 5 messages concurrently
+    sagas: {
+      OrderSaga: { concurrency: 10 }, // per-saga override
+    },
+  },
+});
+```
+
+### Error Classification
+
+Errors are automatically classified:
+
+- **Transient** (retry): Connection errors, timeouts, concurrency conflicts
+- **Permanent** (DLQ): All other errors
+
+```typescript
+import { createErrorHandler } from "@saga-bus/core";
+
+const bus = createBus({
+  // ...
+  errorHandler: createErrorHandler({
+    additionalTransientPatterns: [/rate limit/i],
+    customClassifier: (error, ctx) => {
+      if (error instanceof MyCustomError) return "drop";
+      return null; // fall through to default
+    },
+  }),
+});
+```
+
+### Saga Timeouts
+
+Timeouts have configurable bounds to prevent accidental extreme values:
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `minTimeoutMs` | 1000 | Minimum timeout (1 second) |
+| `maxTimeoutMs` | 604800000 | Maximum timeout (7 days) |
+
+```typescript
+const bus = createBus({
+  // ...
+  worker: {
+    timeoutBounds: {
+      minMs: 5000,      // 5 seconds minimum
+      maxMs: 86400000,  // 1 day maximum
+    },
+  },
+});
+```
+
+### Correlation Failures
+
+Messages that can't be correlated to a saga are dropped by default. You can configure a handler to send them to a DLQ instead:
+
+```typescript
+const bus = createBus({
+  // ...
+  worker: {
+    onCorrelationFailure: async (ctx) => {
+      console.warn(`Could not correlate ${ctx.messageType} to ${ctx.sagaName}`);
+      return "dlq"; // or "drop" (default)
+    },
+  },
+});
+```
+
 ## Development
 
 ```bash

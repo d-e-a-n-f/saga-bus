@@ -12,6 +12,7 @@ import { SagaOrchestrator } from "./SagaOrchestrator.js";
 import { MiddlewarePipeline } from "./MiddlewarePipeline.js";
 import { DefaultLogger } from "./DefaultLogger.js";
 import { DefaultErrorHandler } from "./DefaultErrorHandler.js";
+import { SagaProcessingError } from "../errors/index.js";
 import {
   RetryHandler,
   DEFAULT_RETRY_POLICY,
@@ -66,6 +67,8 @@ export class BusImpl implements Bus {
         transport: config.transport,
         pipeline: this.pipeline,
         logger: this.logger,
+        timeoutBounds: config.worker?.timeoutBounds,
+        onCorrelationFailure: config.worker?.onCorrelationFailure,
       });
     });
   }
@@ -112,24 +115,45 @@ export class BusImpl implements Bus {
                 this.defaultRetryPolicy;
 
               try {
-                await handler.processMessage(envelope);
+                const result = await handler.processMessage(envelope);
+
+                // Handle correlation failures
+                if (result?.failed) {
+                  if (result.action === "dlq") {
+                    await this.retryHandler.sendToDlq(
+                      envelope,
+                      endpoint,
+                      new Error(`Correlation failed for message type ${result.messageType}`)
+                    );
+                  }
+                  // action === "drop" means we just drop the message (default behavior)
+                  continue;
+                }
               } catch (error) {
-                // Log the error
+                // Extract context from SagaProcessingError if available
+                const errorContext = SagaProcessingError.extractContext(error);
+                const originalError = error instanceof SagaProcessingError ? error.cause : error;
+
+                // Log the error with full context
                 this.logger.error("Error processing message", {
                   sagaName: handler.name,
                   messageType: envelope.type,
                   messageId: envelope.id,
+                  correlationId: errorContext?.correlationId,
+                  sagaId: errorContext?.sagaId,
                   attempt: getAttemptCount(envelope),
-                  error: error instanceof Error ? error.message : String(error),
+                  error: originalError instanceof Error ? originalError.message : String(originalError),
                 });
 
-                // Classify the error
-                const action = await this.errorHandler.handle(error, {
+                // Classify the error - pass the original error and rich context
+                const action = await this.errorHandler.handle(originalError, {
                   envelope,
                   sagaName: handler.name,
-                  correlationId: "",
-                  metadata: {},
-                  error,
+                  correlationId: errorContext?.correlationId ?? "",
+                  metadata: {
+                    sagaId: errorContext?.sagaId,
+                  },
+                  error: originalError,
                   setTraceContext: () => {}, // No-op for error context
                 });
 

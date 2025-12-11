@@ -32,6 +32,9 @@ export type {
   SagaRegistration,
   WorkerConfig,
   WorkerRetryPolicy,
+  TimeoutBounds,
+  CorrelationFailureContext,
+  CorrelationFailureHandler,
 } from "./bus.js";
 
 // Middleware

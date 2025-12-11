@@ -8,9 +8,11 @@ import type {
   Transport,
   Logger,
   SagaTimeoutExpired,
+  TimeoutBounds,
+  CorrelationFailureHandler,
 } from "../types/index.js";
 import { SAGA_TIMEOUT_MESSAGE_TYPE } from "../types/index.js";
-import { ConcurrencyError } from "../errors/index.js";
+import { ConcurrencyError, SagaProcessingError } from "../errors/index.js";
 import { SagaContextImpl } from "./SagaContextImpl.js";
 import { MiddlewarePipeline } from "./MiddlewarePipeline.js";
 import { generateSagaId, now } from "./utils.js";
@@ -26,6 +28,19 @@ export interface SagaOrchestratorOptions<
   logger: Logger;
   /** Default endpoint for publishing messages (including timeout messages) */
   defaultEndpoint?: string;
+  /** Timeout bounds to validate against */
+  timeoutBounds?: TimeoutBounds;
+  /** Handler for messages that fail correlation */
+  onCorrelationFailure?: CorrelationFailureHandler;
+}
+
+/**
+ * Result of processing a message that failed correlation.
+ */
+export interface CorrelationFailureResult {
+  readonly failed: true;
+  readonly action: "drop" | "dlq";
+  readonly messageType: string;
 }
 
 /**
@@ -41,6 +56,8 @@ export class SagaOrchestrator<
   private readonly pipeline: MiddlewarePipeline;
   private readonly logger: Logger;
   private readonly defaultEndpoint?: string;
+  private readonly timeoutBounds?: TimeoutBounds;
+  private readonly onCorrelationFailure?: CorrelationFailureHandler;
 
   constructor(options: SagaOrchestratorOptions<TState, TMessages>) {
     this.definition = options.definition;
@@ -49,12 +66,15 @@ export class SagaOrchestrator<
     this.pipeline = options.pipeline;
     this.logger = options.logger;
     this.defaultEndpoint = options.defaultEndpoint;
+    this.timeoutBounds = options.timeoutBounds;
+    this.onCorrelationFailure = options.onCorrelationFailure;
   }
 
   /**
    * Process an incoming message.
+   * @returns CorrelationFailureResult if message failed correlation, undefined otherwise
    */
-  async processMessage(envelope: MessageEnvelope<TMessages>): Promise<void> {
+  async processMessage(envelope: MessageEnvelope<TMessages>): Promise<CorrelationFailureResult | undefined> {
     const message = envelope.payload;
     const correlation = this.definition.getCorrelation(message);
     const correlationId = correlation.getCorrelationId(message);
@@ -65,7 +85,22 @@ export class SagaOrchestrator<
         messageType: message.type,
         messageId: envelope.id,
       });
-      return;
+
+      // Call the correlation failure handler if provided
+      let action: "drop" | "dlq" = "drop";
+      if (this.onCorrelationFailure) {
+        action = await this.onCorrelationFailure({
+          envelope,
+          sagaName: this.definition.name,
+          messageType: message.type,
+        });
+      }
+
+      return {
+        failed: true,
+        action,
+        messageType: message.type,
+      };
     }
 
     // Load existing saga state BEFORE pipeline executes
@@ -96,7 +131,18 @@ export class SagaOrchestrator<
       });
     } catch (error) {
       pipelineCtx.error = error;
-      throw error;
+      // Wrap the error with context for better observability
+      const wrappedError = new SagaProcessingError(
+        error instanceof Error ? error : new Error(String(error)),
+        {
+          sagaName: this.definition.name,
+          correlationId,
+          sagaId: pipelineCtx.sagaId,
+          messageType: message.type,
+          messageId: envelope.id,
+        }
+      );
+      throw wrappedError;
     }
   }
 
@@ -134,6 +180,7 @@ export class SagaOrchestrator<
         correlationId,
         envelope,
         transport: this.transport,
+        timeoutBounds: this.timeoutBounds,
       });
 
       state = await this.definition.createInitialState(message, ctx);
@@ -189,6 +236,7 @@ export class SagaOrchestrator<
       transport: this.transport,
       defaultEndpoint: this.defaultEndpoint,
       currentMetadata: state.metadata,
+      timeoutBounds: this.timeoutBounds,
     });
 
     // Execute handler

@@ -5,7 +5,14 @@ import type {
   Transport,
   TransportPublishOptions,
   SagaStateMetadata,
+  TimeoutBounds,
 } from "../types/index.js";
+
+/** Default timeout bounds */
+export const DEFAULT_TIMEOUT_BOUNDS: Required<TimeoutBounds> = {
+  minMs: 1000,           // 1 second minimum
+  maxMs: 604800000,      // 7 days maximum
+};
 
 export interface SagaContextImplOptions {
   sagaName: string;
@@ -16,6 +23,8 @@ export interface SagaContextImplOptions {
   defaultEndpoint?: string;
   /** Current saga metadata (for reading existing timeout) */
   currentMetadata?: SagaStateMetadata;
+  /** Timeout bounds to validate against */
+  timeoutBounds?: TimeoutBounds;
 }
 
 /**
@@ -39,6 +48,7 @@ export class SagaContextImpl implements SagaContext {
 
   private readonly transport: Transport;
   private readonly defaultEndpoint?: string;
+  private readonly timeoutBounds: Required<TimeoutBounds>;
   private _isCompleted = false;
   private _currentMetadata?: SagaStateMetadata;
   private _pendingTimeoutChange?: PendingTimeoutChange;
@@ -51,6 +61,10 @@ export class SagaContextImpl implements SagaContext {
     this.transport = options.transport;
     this.defaultEndpoint = options.defaultEndpoint;
     this._currentMetadata = options.currentMetadata;
+    this.timeoutBounds = {
+      minMs: options.timeoutBounds?.minMs ?? DEFAULT_TIMEOUT_BOUNDS.minMs,
+      maxMs: options.timeoutBounds?.maxMs ?? DEFAULT_TIMEOUT_BOUNDS.maxMs,
+    };
   }
 
   async publish<TMessage extends BaseMessage>(
@@ -101,6 +115,16 @@ export class SagaContextImpl implements SagaContext {
   setTimeout(delayMs: number): void {
     if (delayMs <= 0) {
       throw new Error("Timeout delay must be positive");
+    }
+    if (delayMs < this.timeoutBounds.minMs) {
+      throw new Error(
+        `Timeout delay ${delayMs}ms is below minimum allowed (${this.timeoutBounds.minMs}ms)`
+      );
+    }
+    if (delayMs > this.timeoutBounds.maxMs) {
+      throw new Error(
+        `Timeout delay ${delayMs}ms exceeds maximum allowed (${this.timeoutBounds.maxMs}ms)`
+      );
     }
     const now = new Date();
     this._pendingTimeoutChange = {

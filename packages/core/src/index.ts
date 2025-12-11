@@ -21,6 +21,9 @@ export type {
   SagaRegistration,
   WorkerConfig,
   WorkerRetryPolicy,
+  TimeoutBounds,
+  CorrelationFailureContext,
+  CorrelationFailureHandler,
   // Middleware
   SagaPipelineContext,
   SagaMiddleware,
@@ -36,7 +39,9 @@ export {
   ConcurrencyError,
   TransientError,
   ValidationError,
+  SagaProcessingError,
 } from "./errors/index.js";
+export type { SagaErrorContext } from "./errors/index.js";
 
 // DSL
 export { createSagaMachine, SagaMachineBuilder } from "./dsl/index.js";
@@ -56,5 +61,6 @@ export { DefaultErrorHandler, createErrorHandler } from "./runtime/index.js";
 export {
   RETRY_HEADERS,
   DEFAULT_RETRY_POLICY,
+  DEFAULT_TIMEOUT_BOUNDS,
   defaultDlqNaming,
 } from "./runtime/index.js";

@@ -31,6 +31,35 @@ export interface WorkerRetryPolicy {
 }
 
 /**
+ * Timeout bounds configuration to prevent accidental extreme values.
+ */
+export interface TimeoutBounds {
+  /** Minimum allowed timeout in milliseconds (default: 1000 = 1 second) */
+  readonly minMs?: number;
+  /** Maximum allowed timeout in milliseconds (default: 604800000 = 7 days) */
+  readonly maxMs?: number;
+}
+
+/**
+ * Context provided when a message fails correlation.
+ */
+export interface CorrelationFailureContext {
+  /** The message envelope that failed correlation */
+  readonly envelope: import("./messages.js").MessageEnvelope;
+  /** Name of the saga that couldn't correlate the message */
+  readonly sagaName: string;
+  /** The message type */
+  readonly messageType: string;
+}
+
+/**
+ * Handler for messages that fail correlation.
+ */
+export type CorrelationFailureHandler = (
+  ctx: CorrelationFailureContext
+) => Promise<"drop" | "dlq"> | "drop" | "dlq";
+
+/**
  * Worker configuration for message processing.
  */
 export interface WorkerConfig {
@@ -50,6 +79,10 @@ export interface WorkerConfig {
   >;
   /** Function to generate DLQ endpoint names */
   readonly dlqNaming?: (endpoint: string) => string;
+  /** Timeout bounds to prevent accidental extreme values */
+  readonly timeoutBounds?: TimeoutBounds;
+  /** Handler for messages that fail correlation (default: "drop") */
+  readonly onCorrelationFailure?: CorrelationFailureHandler;
 }
 
 /**

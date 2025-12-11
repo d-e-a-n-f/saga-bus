@@ -81,3 +81,40 @@ export class SagaTimeoutError extends Error {
     this.timeoutMs = timeoutMs;
   }
 }
+
+/**
+ * Context attached to processing errors for better observability.
+ */
+export interface SagaErrorContext {
+  readonly sagaName: string;
+  readonly correlationId: string;
+  readonly sagaId?: string;
+  readonly messageType: string;
+  readonly messageId: string;
+}
+
+/**
+ * Wraps errors that occur during saga processing with context.
+ * Used by BusImpl to provide richer error context to error handlers.
+ */
+export class SagaProcessingError extends Error {
+  readonly context: SagaErrorContext;
+  override readonly cause: Error;
+
+  constructor(cause: Error, context: SagaErrorContext) {
+    super(`Error processing message in ${context.sagaName}: ${cause.message}`);
+    this.name = "SagaProcessingError";
+    this.cause = cause;
+    this.context = context;
+  }
+
+  /**
+   * Check if an error is a SagaProcessingError and extract context.
+   */
+  static extractContext(error: unknown): SagaErrorContext | null {
+    if (error instanceof SagaProcessingError) {
+      return error.context;
+    }
+    return null;
+  }
+}
