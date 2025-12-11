@@ -1,0 +1,20 @@
+{
+  "$schema": "https://unpkg.com/@changesets/config@3.0.0/schema.json",
+  "changelog": [
+    "@changesets/changelog-github",
+    { "repo": "d-e-a-n-f/saga-bus" }
+  ],
+  "commit": false,
+  "fixed": [],
+  "linked": [
+    ["@saga-bus/*"]
+  ],
+  "access": "public",
+  "baseBranch": "main",
+  "updateInternalDependencies": "patch",
+  "ignore": [
+    "@repo/eslint-config",
+    "@repo/typescript-config",
+    "@saga-bus/examples-shared"
+  ]
+}
