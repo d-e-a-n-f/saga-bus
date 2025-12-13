@@ -14,7 +14,7 @@
     "@saga-bus/examples-shared": "workspace:*",
     "@saga-bus/nextjs": "workspace:*",
     "@saga-bus/transport-rabbitmq": "workspace:*",
-    "next": "^14.2.0",
+    "next": "^14.2.35",
     "react": "^18.3.0",
     "react-dom": "^18.3.0"
   },
