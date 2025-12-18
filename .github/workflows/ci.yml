@@ -51,6 +51,7 @@ jobs:
             store-mongo
             store-dynamodb
             store-redis
+            store-sqlite
             store-prisma
             middleware-logging
             middleware-tracing
@@ -140,6 +141,7 @@ jobs:
           pnpm --filter @saga-bus/test test
           pnpm --filter @saga-bus/transport-inmemory test
           pnpm --filter @saga-bus/store-inmemory test
+          pnpm --filter @saga-bus/store-sqlite test
           pnpm --filter @saga-bus/store-prisma test
           pnpm --filter @saga-bus/middleware-logging test
           pnpm --filter @saga-bus/middleware-tracing test
