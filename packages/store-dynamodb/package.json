@@ -1,6 +1,6 @@
 {
   "name": "@saga-bus/store-dynamodb",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "DynamoDB saga store for saga-bus",
   "type": "module",
   "main": "./dist/index.cjs",
