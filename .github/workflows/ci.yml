@@ -5,12 +5,78 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+    types: [opened, edited, synchronize, reopened]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  pr-title:
+    name: PR Title
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          types: |
+            feat
+            fix
+            docs
+            style
+            refactor
+            perf
+            test
+            build
+            ci
+            chore
+            revert
+          scopes: |
+            core
+            test
+            transport-inmemory
+            transport-rabbitmq
+            transport-kafka
+            transport-sqs
+            transport-redis
+            transport-nats
+            transport-azure-servicebus
+            transport-gcp-pubsub
+            store-inmemory
+            store-postgres
+            store-mysql
+            store-sqlserver
+            store-mongo
+            store-dynamodb
+            store-redis
+            store-prisma
+            middleware-logging
+            middleware-tracing
+            middleware-metrics
+            middleware-validation
+            middleware-idempotency
+            middleware-tenant
+            nestjs
+            nextjs
+            express
+            fastify
+            hono
+            deps
+            ci
+            release
+          requireScope: false
+          subjectPattern: ^.+$
+          subjectPatternError: |
+            PR title must follow conventional commits format:
+            <type>(<scope>): <description>
+
+            Examples:
+            - feat(core): add timeout support
+            - fix(store-postgres): handle connection errors
+            - chore: update dependencies
+
   build:
     name: Build & Lint
     runs-on: ubuntu-latest
