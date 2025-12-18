@@ -1,6 +1,6 @@
 {
   "name": "@saga-bus/store-sqlserver",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "SQL Server saga store for saga-bus",
   "type": "module",
   "main": "./dist/index.js",
@@ -58,7 +58,7 @@
     "vitest": "^3.0.0"
   },
   "peerDependencies": {
-    "@saga-bus/core": ">=0.1.1",
+    "@saga-bus/core": ">=0.1.2",
     "mssql": ">=10.0.0"
   }
 }
