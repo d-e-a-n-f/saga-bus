@@ -53,6 +53,9 @@
     "packages/store-redis": {
       "package-name": "@saga-bus/store-redis"
     },
+    "packages/store-sqlite": {
+      "package-name": "@saga-bus/store-sqlite"
+    },
     "packages/store-prisma": {
       "package-name": "@saga-bus/store-prisma"
     },
