@@ -1,5 +1,16 @@
 # @saga-bus/test
 
+## 0.1.2
+
+### Patch Changes
+
+- [`c3e3bea`](https://github.com/d-e-a-n-f/saga-bus/commit/c3e3beabe23d22f00c373d1fb5dcb7b654d1ffb0) - Fix npm publish rate limiting by using sequential publish script. Republish packages that failed due to E429 rate limit error.
+
+- Updated dependencies [[`c3e3bea`](https://github.com/d-e-a-n-f/saga-bus/commit/c3e3beabe23d22f00c373d1fb5dcb7b654d1ffb0)]:
+  - @saga-bus/core@0.1.2
+  - @saga-bus/transport-inmemory@0.1.2
+  - @saga-bus/store-inmemory@0.1.2
+
 ## 0.1.1
 
 ### Patch Changes
