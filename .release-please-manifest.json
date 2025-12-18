@@ -16,7 +16,7 @@
   "packages/store-mongo": "0.1.3",
   "packages/store-dynamodb": "0.1.3",
   "packages/store-redis": "0.1.3",
-  "packages/store-sqlite": "0.1.3",
+  "packages/store-sqlite": "0.1.4",
   "packages/store-prisma": "0.1.3",
   "packages/middleware-logging": "0.1.3",
   "packages/middleware-tracing": "0.1.3",
