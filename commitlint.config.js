@@ -22,6 +22,7 @@ module.exports = {
         'store-mongo',
         'store-dynamodb',
         'store-redis',
+        'store-sqlite',
         'store-prisma',
         'middleware-logging',
         'middleware-tracing',
