@@ -1,0 +1,113 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "packages": {
+    "packages/core": {
+      "package-name": "@saga-bus/core",
+      "changelog-path": "CHANGELOG.md"
+    },
+    "packages/test": {
+      "package-name": "@saga-bus/test"
+    },
+    "packages/transport-inmemory": {
+      "package-name": "@saga-bus/transport-inmemory"
+    },
+    "packages/transport-rabbitmq": {
+      "package-name": "@saga-bus/transport-rabbitmq"
+    },
+    "packages/transport-kafka": {
+      "package-name": "@saga-bus/transport-kafka"
+    },
+    "packages/transport-sqs": {
+      "package-name": "@saga-bus/transport-sqs"
+    },
+    "packages/transport-redis": {
+      "package-name": "@saga-bus/transport-redis"
+    },
+    "packages/transport-nats": {
+      "package-name": "@saga-bus/transport-nats"
+    },
+    "packages/transport-azure-servicebus": {
+      "package-name": "@saga-bus/transport-azure-servicebus"
+    },
+    "packages/transport-gcp-pubsub": {
+      "package-name": "@saga-bus/transport-gcp-pubsub"
+    },
+    "packages/store-inmemory": {
+      "package-name": "@saga-bus/store-inmemory"
+    },
+    "packages/store-postgres": {
+      "package-name": "@saga-bus/store-postgres"
+    },
+    "packages/store-mysql": {
+      "package-name": "@saga-bus/store-mysql"
+    },
+    "packages/store-sqlserver": {
+      "package-name": "@saga-bus/store-sqlserver"
+    },
+    "packages/store-mongo": {
+      "package-name": "@saga-bus/store-mongo"
+    },
+    "packages/store-dynamodb": {
+      "package-name": "@saga-bus/store-dynamodb"
+    },
+    "packages/store-redis": {
+      "package-name": "@saga-bus/store-redis"
+    },
+    "packages/store-prisma": {
+      "package-name": "@saga-bus/store-prisma"
+    },
+    "packages/middleware-logging": {
+      "package-name": "@saga-bus/middleware-logging"
+    },
+    "packages/middleware-tracing": {
+      "package-name": "@saga-bus/middleware-tracing"
+    },
+    "packages/middleware-metrics": {
+      "package-name": "@saga-bus/middleware-metrics"
+    },
+    "packages/middleware-validation": {
+      "package-name": "@saga-bus/middleware-validation"
+    },
+    "packages/middleware-idempotency": {
+      "package-name": "@saga-bus/middleware-idempotency"
+    },
+    "packages/middleware-tenant": {
+      "package-name": "@saga-bus/middleware-tenant"
+    },
+    "packages/nestjs": {
+      "package-name": "@saga-bus/nestjs"
+    },
+    "packages/nextjs": {
+      "package-name": "@saga-bus/nextjs"
+    },
+    "packages/express": {
+      "package-name": "@saga-bus/express"
+    },
+    "packages/fastify": {
+      "package-name": "@saga-bus/fastify"
+    },
+    "packages/hono": {
+      "package-name": "@saga-bus/hono"
+    }
+  },
+  "release-type": "node",
+  "bump-minor-pre-major": true,
+  "bump-patch-for-minor-pre-major": true,
+  "group-pull-request-title-pattern": "chore: release ${version}",
+  "pull-request-title-pattern": "chore: release ${component} ${version}",
+  "include-component-in-tag": false,
+  "separate-pull-requests": false,
+  "changelog-sections": [
+    {"type": "feat", "section": "Features"},
+    {"type": "fix", "section": "Bug Fixes"},
+    {"type": "perf", "section": "Performance Improvements"},
+    {"type": "revert", "section": "Reverts"},
+    {"type": "docs", "section": "Documentation", "hidden": true},
+    {"type": "style", "section": "Styles", "hidden": true},
+    {"type": "chore", "section": "Miscellaneous Chores", "hidden": true},
+    {"type": "refactor", "section": "Code Refactoring", "hidden": true},
+    {"type": "test", "section": "Tests", "hidden": true},
+    {"type": "build", "section": "Build System", "hidden": true},
+    {"type": "ci", "section": "Continuous Integration", "hidden": true}
+  ]
+}
