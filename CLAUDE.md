@@ -25,15 +25,17 @@ pnpm --filter @saga-bus/core dev        # Watch mode
 # Run tests with coverage
 pnpm --filter @saga-bus/core test -- --coverage
 
-# Run a specific test file
-pnpm --filter @saga-bus/core test src/__tests__/SagaBuilder.test.ts
+# Release (bumps versions, tags, pushes - triggers CI publish)
+pnpm release patch    # 0.1.3 → 0.1.4
+pnpm release minor    # 0.1.3 → 0.2.0
+pnpm release major    # 0.1.3 → 1.0.0
 ```
 
 ## Architecture
 
 ### Package Structure
 
-- **packages/core** - Core types, fluent DSL (`createSagaMachine`), and runtime (`createBus`). Contains three main modules:
+- **packages/core** - Core types, fluent DSL (`createSagaMachine`), and runtime (`createBus`). Contains:
   - `dsl/` - Saga builder DSL for defining sagas
   - `runtime/` - Bus implementation, orchestrator, error handling
   - `types/` - Shared interfaces (Transport, SagaStore, Middleware, etc.)
@@ -67,7 +69,13 @@ All stores implement `SagaStore` from `@saga-bus/core`:
 - **pnpm workspaces** with **Turborepo** for task orchestration
 - **tsup** for building packages (ESM + CJS dual output)
 - **Vitest** for testing (workspace config in `vitest.workspace.ts`)
-- **Changesets** for versioning (`pnpm changeset`)
+
+### Release Process
+
+1. Run `pnpm release [patch|minor|major]` locally
+2. Script bumps all package versions, commits, creates git tag, pushes
+3. GitHub Actions triggers on `v*` tag
+4. CI builds, tests, publishes to npm sequentially, creates GitHub Release
 
 ### Conventions
 
