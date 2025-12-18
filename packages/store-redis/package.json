@@ -52,5 +52,6 @@
   "bugs": {
     "url": "https://github.com/d-e-a-n-f/saga-bus/issues"
   },
-  "homepage": "https://github.com/d-e-a-n-f/saga-bus#readme"
+  "homepage": "https://github.com/d-e-a-n-f/saga-bus#readme",
+  "keywords": ["saga-bus", "saga", "redis", "store", "state-machine"]
 }

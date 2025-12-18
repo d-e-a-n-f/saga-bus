@@ -47,5 +47,11 @@
   },
   "peerDependencies": {
     "@azure/service-bus": ">=7.0.0"
-  }
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/d-e-a-n-f/saga-bus/issues"
+  },
+  "homepage": "https://github.com/d-e-a-n-f/saga-bus#readme",
+  "keywords": ["saga-bus", "saga", "azure", "service-bus", "transport", "message-bus"]
 }
