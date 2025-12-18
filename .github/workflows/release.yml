@@ -2,34 +2,19 @@ name: Release
 
 on:
   push:
-    branches:
-      - main
-  workflow_dispatch:
-    inputs:
-      dry_run:
-        description: 'Dry run (skip npm publish)'
-        required: false
-        default: false
-        type: boolean
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: false
+    tags:
+      - 'v*'
 
 jobs:
   release:
-    name: Release
     runs-on: ubuntu-latest
+
     permissions:
       contents: write
-      pull-requests: write
       id-token: write
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@v4
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
@@ -47,16 +32,15 @@ jobs:
       - name: Build
         run: pnpm build
 
-      - name: Create Release Pull Request or Publish
-        id: changesets
-        uses: changesets/action@v1
-        with:
-          title: 'chore: release packages'
-          commit: 'chore: release packages'
-          # Use sequential publish to avoid npm rate limiting
-          publish: ${{ inputs.dry_run == true && 'echo "Dry run - skipping publish"' || 'node scripts/publish-sequential.mjs' }}
-          version: pnpm release:version
+      - name: Test
+        run: pnpm test
+
+      - name: Publish to npm (sequential)
+        run: node scripts/publish-sequential.mjs
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
