@@ -37,7 +37,10 @@
     "typecheck": "turbo run check-types",
     "clean": "turbo run clean && rm -rf node_modules",
     "prepare": "husky",
-    "release": "node scripts/release.mjs"
+    "release": "node scripts/release.mjs",
+    "docs": "pnpm --filter docs start",
+    "docs:build": "pnpm --filter docs build",
+    "docs:serve": "pnpm --filter docs serve"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.0.0",
