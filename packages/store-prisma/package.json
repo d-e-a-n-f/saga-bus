@@ -1,6 +1,6 @@
 {
   "name": "@saga-bus/store-prisma",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Prisma ORM adapter for saga-bus state storage",
   "type": "module",
   "main": "./dist/index.cjs",
