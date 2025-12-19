@@ -1,7 +1,19 @@
 ---
-sidebar_position: 2
+sidebar_position: 5
+title: Mocking
 ---
 
-# Testing
+# Mocking
 
 Coming soon.
+
+## Mocking External Services
+
+```typescript
+import { vi } from 'vitest';
+
+const mockPaymentService = {
+  capture: vi.fn().mockResolvedValue({ transactionId: 'txn-123' }),
+  refund: vi.fn().mockResolvedValue(true),
+};
+```
