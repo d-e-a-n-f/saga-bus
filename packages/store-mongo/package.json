@@ -1,6 +1,6 @@
 {
   "name": "@saga-bus/store-mongo",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "MongoDB saga store for saga-bus",
   "type": "module",
   "main": "./dist/index.cjs",
