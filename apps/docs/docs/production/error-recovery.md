@@ -1,7 +1,16 @@
 ---
-sidebar_position: 2
+sidebar_position: 5
+title: Error Recovery
 ---
 
-# Production
+# Error Recovery
 
 Coming soon.
+
+## Dead Letter Queues
+
+Failed messages go to DLQ for manual inspection.
+
+## Manual Intervention
+
+Tools for replaying or fixing stuck sagas.

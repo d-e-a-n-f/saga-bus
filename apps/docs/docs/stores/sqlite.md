@@ -1,13 +1,26 @@
 ---
-sidebar_position: 4
+sidebar_position: 9
+title: SQLite
 ---
 
-# Store
+# SQLite Store
 
-Coming soon. See package README for details.
+Perfect for local development and testing.
 
 ## Installation
 
 ```bash
-npm install @saga-bus/store-*
+npm install @saga-bus/store-sqlite better-sqlite3
+```
+
+## Usage
+
+```typescript
+import Database from 'better-sqlite3';
+import { SqliteSagaStore, createSchema } from '@saga-bus/store-sqlite';
+
+const db = new Database(':memory:'); // or 'path/to/db.sqlite'
+createSchema(db);
+
+const store = new SqliteSagaStore({ db });
 ```

@@ -1,7 +1,16 @@
 ---
-sidebar_position: 2
+sidebar_position: 4
+title: Scaling
 ---
 
-# Production
+# Scaling
 
 Coming soon.
+
+## Horizontal Scaling
+
+Run multiple worker instances for parallel processing.
+
+## Partitioning
+
+Use message routing for workload distribution.

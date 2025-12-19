@@ -1,13 +1,32 @@
 ---
 sidebar_position: 2
+title: NestJS
 ---
 
-# Framework Integration
+# NestJS Integration
 
 Coming soon. See package README for details.
 
 ## Installation
 
 ```bash
-npm install @saga-bus/*
+npm install @saga-bus/nestjs
+```
+
+## Usage
+
+```typescript
+import { Module } from '@nestjs/common';
+import { SagaBusModule } from '@saga-bus/nestjs';
+
+@Module({
+  imports: [
+    SagaBusModule.forRoot({
+      transport: { /* config */ },
+      store: { /* config */ },
+      sagas: [OrderSaga],
+    }),
+  ],
+})
+export class AppModule {}
 ```

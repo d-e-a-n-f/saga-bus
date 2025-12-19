@@ -1,13 +1,24 @@
 ---
-sidebar_position: 2
+sidebar_position: 6
+title: Hono
 ---
 
-# Framework Integration
+# Hono Integration
 
 Coming soon. See package README for details.
 
 ## Installation
 
 ```bash
-npm install @saga-bus/*
+npm install @saga-bus/hono
+```
+
+## Usage
+
+```typescript
+import { Hono } from 'hono';
+import { sagaBusMiddleware } from '@saga-bus/hono';
+
+const app = new Hono();
+app.use('*', sagaBusMiddleware({ bus }));
 ```

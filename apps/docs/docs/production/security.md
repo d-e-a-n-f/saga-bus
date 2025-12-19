@@ -1,7 +1,16 @@
 ---
-sidebar_position: 2
+sidebar_position: 6
+title: Security
 ---
 
-# Production
+# Security
 
 Coming soon.
+
+## Message Authentication
+
+Validate message authenticity.
+
+## Authorization
+
+Control who can publish/consume messages.

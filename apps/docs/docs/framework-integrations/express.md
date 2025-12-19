@@ -1,13 +1,25 @@
 ---
-sidebar_position: 2
+sidebar_position: 4
+title: Express
 ---
 
-# Framework Integration
+# Express Integration
 
 Coming soon. See package README for details.
 
 ## Installation
 
 ```bash
-npm install @saga-bus/*
+npm install @saga-bus/express
+```
+
+## Usage
+
+```typescript
+import express from 'express';
+import { sagaBusMiddleware, createHealthRouter } from '@saga-bus/express';
+
+const app = express();
+app.use(sagaBusMiddleware({ bus }));
+app.use('/health', createHealthRouter(bus));
 ```

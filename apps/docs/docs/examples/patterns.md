@@ -1,7 +1,24 @@
 ---
-sidebar_position: 2
+sidebar_position: 4
+title: Common Patterns
 ---
 
-# Example
+# Common Saga Patterns
 
-Coming soon. See the example in the repository.
+Coming soon.
+
+## Compensation
+
+Undo operations when steps fail.
+
+## Parallel Steps
+
+Execute multiple steps concurrently.
+
+## Timeout Handling
+
+Handle missing events gracefully.
+
+## State Machines
+
+Model complex state transitions.
