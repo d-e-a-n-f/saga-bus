@@ -1,6 +1,6 @@
 {
   "name": "@saga-bus/transport-redis",
-  "version": "0.1.6",
+  "version": "0.2.0",
   "description": "Redis Streams transport for saga-bus",
   "type": "module",
   "main": "./dist/index.cjs",

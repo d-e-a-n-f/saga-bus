@@ -1,6 +1,6 @@
 {
   "name": "@saga-bus/fastify",
-  "version": "0.1.6",
+  "version": "0.2.0",
   "description": "Fastify integration for saga-bus",
   "type": "module",
   "main": "./dist/index.js",
