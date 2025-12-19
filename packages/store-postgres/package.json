@@ -1,6 +1,6 @@
 {
   "name": "@saga-bus/store-postgres",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "PostgreSQL saga store for saga-bus using native pg driver",
   "type": "module",
   "main": "./dist/index.js",
