@@ -18,10 +18,14 @@
     "@docusaurus/core": "3.9.2",
     "@docusaurus/preset-classic": "3.9.2",
     "@mdx-js/react": "^3.0.0",
+    "@monaco-editor/react": "^4.7.0",
+    "@types/dagre": "^0.7.53",
     "clsx": "^2.0.0",
+    "dagre": "^0.8.5",
     "prism-react-renderer": "^2.3.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "reactflow": "^11.11.4"
   },
   "devDependencies": {
     "@docusaurus/module-type-aliases": "3.9.2",

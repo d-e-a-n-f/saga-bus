@@ -1,30 +1,595 @@
 /**
- * Any CSS included here will be global. The classic template
- * bundles Infima by default. Infima is a CSS framework designed to
- * work well for content-centric websites.
+ * Saga Bus Documentation Theme
+ * Custom colors and styling
  */
 
-/* You can override the default Infima variables here. */
 :root {
-  --ifm-color-primary: #2e8555;
-  --ifm-color-primary-dark: #29784c;
-  --ifm-color-primary-darker: #277148;
-  --ifm-color-primary-darkest: #205d3b;
-  --ifm-color-primary-light: #33925d;
-  --ifm-color-primary-lighter: #359962;
-  --ifm-color-primary-lightest: #3cad6e;
-  --ifm-code-font-size: 95%;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  /* Primary colors - Indigo/Purple */
+  --ifm-color-primary: #6366f1;
+  --ifm-color-primary-dark: #4f46e5;
+  --ifm-color-primary-darker: #4338ca;
+  --ifm-color-primary-darkest: #3730a3;
+  --ifm-color-primary-light: #818cf8;
+  --ifm-color-primary-lighter: #a5b4fc;
+  --ifm-color-primary-lightest: #c7d2fe;
+
+  /* Typography */
+  --ifm-font-family-base: 'Inter', system-ui, -apple-system, sans-serif;
+  --ifm-font-family-monospace: 'JetBrains Mono', 'Fira Code', monospace;
+  --ifm-code-font-size: 90%;
+  --ifm-heading-font-weight: 700;
+
+  /* Spacing */
+  --ifm-spacing-horizontal: 1.5rem;
+  --ifm-navbar-height: 4rem;
+
+  /* Borders */
+  --ifm-global-radius: 0.5rem;
+  --ifm-code-border-radius: 0.375rem;
+
+  /* Sidebar */
+  --doc-sidebar-width: 280px;
 }
 
-/* For readability concerns, you should choose a lighter palette in dark mode. */
+/* Dark mode colors */
 [data-theme='dark'] {
-  --ifm-color-primary: #25c2a0;
-  --ifm-color-primary-dark: #21af90;
-  --ifm-color-primary-darker: #1fa588;
-  --ifm-color-primary-darkest: #1a8870;
-  --ifm-color-primary-light: #29d5b0;
-  --ifm-color-primary-lighter: #32d8b4;
-  --ifm-color-primary-lightest: #4fddbf;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+  --ifm-color-primary: #818cf8;
+  --ifm-color-primary-dark: #6366f1;
+  --ifm-color-primary-darker: #4f46e5;
+  --ifm-color-primary-darkest: #4338ca;
+  --ifm-color-primary-light: #a5b4fc;
+  --ifm-color-primary-lighter: #c7d2fe;
+  --ifm-color-primary-lightest: #e0e7ff;
+
+  --ifm-background-color: #0f172a;
+  --ifm-background-surface-color: #1e293b;
+  --ifm-navbar-background-color: #0f172a;
+  --ifm-footer-background-color: #0f172a;
+  --ifm-code-background: #1e293b;
+}
+
+/* Hero section styling */
+.hero {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #6366f1 100%);
+  padding: 4rem 0;
+}
+
+.hero--primary {
+  --ifm-hero-background-color: transparent;
+  --ifm-hero-text-color: #ffffff;
+}
+
+.hero__title {
+  font-size: 3.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.hero__subtitle {
+  font-size: 1.5rem;
+  opacity: 0.9;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Button styling */
+.button {
+  font-weight: 600;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.button--secondary {
+  background-color: #ffffff;
+  color: #4f46e5;
+  border: none;
+}
+
+.button--secondary:hover {
+  background-color: #f1f5f9;
+  color: #4338ca;
+}
+
+.button--outline {
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+}
+
+.button--outline:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #ffffff;
+}
+
+/* Navbar styling */
+.navbar {
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.navbar__title {
+  font-weight: 700;
+  font-size: 1.25rem;
+}
+
+.navbar__link {
+  font-weight: 500;
+}
+
+/* Sidebar styling */
+.menu__link {
+  font-size: 0.9rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  transition: all 0.15s ease;
+}
+
+.menu__link:hover {
+  background-color: var(--ifm-color-primary-lightest);
+}
+
+[data-theme='dark'] .menu__link:hover {
+  background-color: var(--ifm-background-surface-color);
+}
+
+.menu__link--active {
+  background-color: var(--ifm-color-primary-lightest);
+  color: var(--ifm-color-primary-darkest);
+  font-weight: 600;
+}
+
+[data-theme='dark'] .menu__link--active {
+  background-color: var(--ifm-color-primary-darkest);
+  color: var(--ifm-color-primary-lightest);
+}
+
+.menu__list-item-collapsible .menu__link {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  color: var(--ifm-color-content-secondary);
+}
+
+/* Code blocks */
+.prism-code {
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+code {
+  padding: 0.2em 0.4em;
+  border-radius: 0.25rem;
+}
+
+/* Tables */
+table {
+  display: table;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  background-color: var(--ifm-color-primary-lightest);
+  font-weight: 600;
+  text-align: left;
+}
+
+[data-theme='dark'] th {
+  background-color: var(--ifm-background-surface-color);
+}
+
+td, th {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--ifm-table-border-color);
+}
+
+/* Admonitions */
+.admonition {
+  border-radius: 0.5rem;
+  border-left-width: 4px;
+}
+
+/* Footer */
+.footer {
+  border-top: 1px solid var(--ifm-toc-border-color);
+}
+
+.footer__title {
+  font-weight: 700;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Announcement bar */
+.announcementBar_node_modules-\@docusaurus-theme-classic-lib-theme-AnnouncementBar-styles-module {
+  background: linear-gradient(90deg, #4f46e5, #7c3aed);
+  font-weight: 500;
+}
+
+/* Features section */
+.features {
+  padding: 4rem 0;
+  background-color: var(--ifm-background-surface-color);
+}
+
+[data-theme='dark'] .features {
+  background-color: #1e293b;
+}
+
+/* Markdown content */
+.markdown h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.markdown h2 {
+  font-size: 1.75rem;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--ifm-toc-border-color);
+}
+
+.markdown h3 {
+  font-size: 1.25rem;
+  margin-top: 2rem;
+}
+
+/* Better link styling */
+.markdown a {
+  text-decoration: none;
+  border-bottom: 1px solid var(--ifm-color-primary-light);
+  transition: border-color 0.2s ease;
+}
+
+.markdown a:hover {
+  border-bottom-color: var(--ifm-color-primary);
+}
+
+/* Search */
+.DocSearch-Button {
+  border-radius: 0.5rem !important;
+}
+
+/* TOC */
+.table-of-contents__link {
+  font-size: 0.875rem;
+}
+
+.table-of-contents__link--active {
+  font-weight: 600;
+}
+
+/* Homepage features */
+.col--4 {
+  padding: 1.5rem;
+}
+
+.text--center h3 {
+  color: var(--ifm-color-primary);
+  margin-bottom: 0.5rem;
+}
+
+/* =====================================================
+   ReactFlow / Flow Diagram Styles
+   ===================================================== */
+
+:root {
+  /* Flow diagram colors */
+  --flow-primary: #6366f1;
+  --flow-primary-bg: rgba(99, 102, 241, 0.1);
+  --flow-secondary: #64748b;
+  --flow-success: #22c55e;
+  --flow-success-bg: rgba(34, 197, 94, 0.1);
+  --flow-error: #ef4444;
+  --flow-error-bg: rgba(239, 68, 68, 0.1);
+  --flow-warning: #f59e0b;
+  --flow-warning-bg: rgba(245, 158, 11, 0.1);
+
+  --flow-node-bg: #ffffff;
+  --flow-node-border: #e2e8f0;
+  --flow-edge: #94a3b8;
+  --flow-grid: #e2e8f0;
+  --flow-minimap-mask: rgba(255, 255, 255, 0.8);
+}
+
+[data-theme='dark'] {
+  --flow-node-bg: #1e293b;
+  --flow-node-border: #334155;
+  --flow-edge: #64748b;
+  --flow-grid: #334155;
+  --flow-minimap-mask: rgba(15, 23, 42, 0.8);
+  --flow-primary-bg: rgba(129, 140, 248, 0.15);
+  --flow-success-bg: rgba(34, 197, 94, 0.15);
+  --flow-error-bg: rgba(239, 68, 68, 0.15);
+  --flow-warning-bg: rgba(245, 158, 11, 0.15);
+}
+
+/* Flow diagram container */
+.flow-diagram-container {
+  border: 1px solid var(--flow-node-border);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  margin: 1.5rem 0;
+  background: var(--ifm-background-surface-color);
+}
+
+/* State node styles */
+.flow-state-node {
+  padding: 12px 20px;
+  border-radius: 8px;
+  background: var(--flow-node-bg);
+  border: 1px solid var(--flow-node-border);
+  min-width: 120px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.flow-state-node:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.flow-state-label {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--ifm-color-content);
+}
+
+.flow-state-description {
+  font-size: 0.75rem;
+  color: var(--ifm-color-content-secondary);
+  margin-top: 4px;
+}
+
+/* Service node styles */
+.flow-service-node {
+  padding: 16px 20px;
+  border-radius: 8px;
+  background: var(--flow-node-bg);
+  border: 2px solid var(--flow-primary);
+  min-width: 100px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.flow-service-icon {
+  font-size: 1.5rem;
+  margin-bottom: 4px;
+}
+
+.flow-service-label {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--ifm-color-content);
+}
+
+/* Decision node styles */
+.flow-decision-node {
+  width: 100px;
+  height: 100px;
+  background: var(--flow-node-bg);
+  border: 2px solid var(--flow-warning);
+  transform: rotate(45deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flow-decision-content {
+  transform: rotate(-45deg);
+  text-align: center;
+  padding: 8px;
+}
+
+.flow-decision-label {
+  font-weight: 600;
+  font-size: 0.75rem;
+  color: var(--ifm-color-content);
+}
+
+.flow-decision-condition {
+  font-size: 0.625rem;
+  color: var(--ifm-color-content-secondary);
+  margin-top: 2px;
+}
+
+/* Handle styles */
+.flow-handle {
+  width: 8px !important;
+  height: 8px !important;
+  background: var(--flow-primary) !important;
+  border: 2px solid var(--flow-node-bg) !important;
+}
+
+.flow-handle-diamond {
+  width: 6px !important;
+  height: 6px !important;
+}
+
+/* ReactFlow controls */
+.react-flow__controls {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  border-radius: 8px !important;
+  overflow: hidden;
+}
+
+.react-flow__controls-button {
+  background: var(--flow-node-bg) !important;
+  border-bottom: 1px solid var(--flow-node-border) !important;
+  fill: var(--ifm-color-content) !important;
+}
+
+.react-flow__controls-button:hover {
+  background: var(--ifm-background-surface-color) !important;
+}
+
+/* ReactFlow edges */
+.react-flow__edge-path {
+  stroke-width: 2;
+}
+
+.react-flow__edge.animated path {
+  stroke-dasharray: 5;
+  animation: flowEdge 0.5s linear infinite;
+}
+
+@keyframes flowEdge {
+  to {
+    stroke-dashoffset: -10;
+  }
+}
+
+/* SagaFlowViewer styles */
+.saga-flow-viewer {
+  border: 1px solid var(--flow-node-border);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  margin: 1.5rem 0;
+  background: var(--ifm-background-surface-color);
+}
+
+.saga-flow-viewer-title {
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  background: var(--flow-node-bg);
+  border-bottom: 1px solid var(--flow-node-border);
+  color: var(--ifm-color-content);
+}
+
+.saga-flow-viewer-content {
+  display: flex;
+  flex-direction: row;
+}
+
+.saga-flow-viewer-diagram {
+  flex: 1;
+  min-width: 0;
+  border-right: 1px solid var(--flow-node-border);
+}
+
+.saga-flow-viewer-code {
+  flex: 1;
+  min-width: 0;
+  overflow: auto;
+  max-height: 100%;
+}
+
+.saga-flow-viewer-code pre {
+  margin: 0 !important;
+  border-radius: 0 !important;
+  height: 100%;
+}
+
+.saga-flow-viewer-info {
+  padding: 0.5rem 1rem;
+  font-size: 0.75rem;
+  background: var(--flow-primary-bg);
+  border-top: 1px solid var(--flow-node-border);
+  color: var(--flow-primary);
+}
+
+/* Responsive: stack on mobile */
+@media (max-width: 768px) {
+  .saga-flow-viewer-content {
+    flex-direction: column;
+  }
+
+  .saga-flow-viewer-diagram {
+    border-right: none;
+    border-bottom: 1px solid var(--flow-node-border);
+    height: 300px;
+  }
+
+  .saga-flow-viewer-code {
+    max-height: 300px;
+  }
+}
+
+/* =====================================================
+   LiveSagaEditor - Interactive Saga Editor
+   ===================================================== */
+
+.live-saga-editor {
+  border: 1px solid var(--flow-node-border);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  margin: 1.5rem 0;
+  background: var(--ifm-background-surface-color);
+}
+
+.live-saga-editor-title {
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  background: var(--flow-node-bg);
+  border-bottom: 1px solid var(--flow-node-border);
+  color: var(--ifm-color-content);
+}
+
+.live-saga-editor-content {
+  display: flex;
+  flex-direction: row;
+}
+
+.live-saga-editor-code {
+  flex: 1.2;
+  min-width: 400px;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--flow-node-border);
+}
+
+.live-saga-editor-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--ifm-color-content-secondary);
+  font-size: 0.875rem;
+}
+
+.live-saga-editor-error {
+  padding: 0.5rem 1rem;
+  background: var(--flow-error-bg);
+  color: var(--flow-error);
+  font-size: 0.75rem;
+  border-top: 1px solid var(--flow-error);
+}
+
+.live-saga-editor-diagram {
+  flex: 1;
+  min-width: 350px;
+}
+
+.live-saga-editor-help {
+  padding: 0.5rem 1rem;
+  font-size: 0.7rem;
+  background: var(--flow-primary-bg);
+  border-top: 1px solid var(--flow-node-border);
+  color: var(--ifm-color-content-secondary);
+}
+
+.live-saga-editor-help strong {
+  color: var(--flow-primary);
+}
+
+/* Responsive: stack on mobile */
+@media (max-width: 768px) {
+  .live-saga-editor-content {
+    flex-direction: column;
+  }
+
+  .live-saga-editor-code {
+    border-right: none;
+    border-bottom: 1px solid var(--flow-node-border);
+    height: 250px;
+  }
+
+  .live-saga-editor-diagram {
+    height: 350px;
+  }
 }

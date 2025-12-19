@@ -8,15 +8,18 @@ Strategies for testing saga-based applications.
 
 ## Testing Levels
 
-```
-┌─────────────────────────────────────┐
-│           E2E Tests                 │  Full system with real infra
-├─────────────────────────────────────┤
-│      Integration Tests              │  Saga flows with in-memory
-├─────────────────────────────────────┤
-│         Unit Tests                  │  Individual handlers
-└─────────────────────────────────────┘
-```
+export const testNodes = [
+  { id: 'e2e', type: 'stateNode', position: { x: 150, y: 0 }, data: { label: 'E2E Tests', description: 'Full system with real infra', status: 'active' } },
+  { id: 'integration', type: 'stateNode', position: { x: 150, y: 90 }, data: { label: 'Integration Tests', description: 'Saga flows with in-memory', status: 'active' } },
+  { id: 'unit', type: 'stateNode', position: { x: 150, y: 180 }, data: { label: 'Unit Tests', description: 'Individual handlers', status: 'success' } },
+];
+
+export const testEdges = [
+  { id: 'te1', source: 'e2e', target: 'integration' },
+  { id: 'te2', source: 'integration', target: 'unit' },
+];
+
+<FlowDiagram nodes={testNodes} edges={testEdges} height={280} />
 
 ## Test Harness
 

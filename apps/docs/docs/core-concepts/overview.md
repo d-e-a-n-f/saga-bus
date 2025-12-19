@@ -17,24 +17,36 @@ A **saga** is a long-running business process that spans multiple services or st
 
 ## The Saga Pattern
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                        Order Saga                           │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  OrderSubmitted ──► CapturePayment ──► ReserveInventory    │
-│        │                  │                   │             │
-│        ▼                  ▼                   ▼             │
-│    [pending]        [processing]        [confirmed]         │
-│                           │                   │             │
-│                     PaymentFailed        ShipOrder          │
-│                           │                   │             │
-│                           ▼                   ▼             │
-│                      [cancelled]         [shipped]          │
-│                                              │              │
-│                                         [completed]         │
-└─────────────────────────────────────────────────────────────┘
-```
+export const sagaPatternNodes = [
+  { id: 'submitted', type: 'stateNode', position: { x: 50, y: 50 }, data: { label: 'OrderSubmitted', status: 'initial' } },
+  { id: 'pending', type: 'stateNode', position: { x: 50, y: 150 }, data: { label: 'pending', status: 'pending' } },
+  { id: 'payment', type: 'serviceNode', position: { x: 200, y: 50 }, data: { label: 'CapturePayment', type: 'service' } },
+  { id: 'processing', type: 'stateNode', position: { x: 200, y: 150 }, data: { label: 'processing', status: 'active' } },
+  { id: 'inventory', type: 'serviceNode', position: { x: 350, y: 50 }, data: { label: 'ReserveInventory', type: 'service' } },
+  { id: 'confirmed', type: 'stateNode', position: { x: 350, y: 150 }, data: { label: 'confirmed', status: 'success' } },
+  { id: 'cancelled', type: 'stateNode', position: { x: 200, y: 270 }, data: { label: 'cancelled', status: 'error' } },
+  { id: 'ship', type: 'serviceNode', position: { x: 350, y: 270 }, data: { label: 'ShipOrder', type: 'service' } },
+  { id: 'shipped', type: 'stateNode', position: { x: 350, y: 370 }, data: { label: 'shipped', status: 'active' } },
+  { id: 'completed', type: 'stateNode', position: { x: 350, y: 470 }, data: { label: 'completed', status: 'success' } },
+];
+
+export const sagaPatternEdges = [
+  { id: 'e1', source: 'submitted', target: 'pending', animated: true },
+  { id: 'e2', source: 'submitted', target: 'payment' },
+  { id: 'e3', source: 'payment', target: 'processing' },
+  { id: 'e4', source: 'payment', target: 'inventory' },
+  { id: 'e5', source: 'inventory', target: 'confirmed' },
+  { id: 'e6', source: 'processing', target: 'cancelled', label: 'PaymentFailed', data: { type: 'error' } },
+  { id: 'e7', source: 'confirmed', target: 'ship' },
+  { id: 'e8', source: 'ship', target: 'shipped' },
+  { id: 'e9', source: 'shipped', target: 'completed', data: { type: 'success' } },
+];
+
+<FlowDiagram
+  nodes={sagaPatternNodes}
+  edges={sagaPatternEdges}
+  height={550}
+/>
 
 ## Key Components
 
@@ -112,28 +124,35 @@ const bus = createBus({
 
 ## Saga Lifecycle
 
-```
-1. Message Received
-       │
-       ▼
-2. Find Saga Instance (by correlation)
-       │
-       ├── Not Found + canStart = true ──► Create New Instance
-       │
-       └── Found ──► Load State
-              │
-              ▼
-3. Execute Handler
-       │
-       ▼
-4. Update State (with optimistic concurrency)
-       │
-       ▼
-5. Publish Outgoing Messages
-       │
-       ▼
-6. Acknowledge Original Message
-```
+export const lifecycleNodes = [
+  { id: 'receive', type: 'stateNode', position: { x: 200, y: 0 }, data: { label: '1. Message Received', status: 'initial' } },
+  { id: 'find', type: 'stateNode', position: { x: 200, y: 80 }, data: { label: '2. Find Saga Instance', description: 'by correlation' } },
+  { id: 'decision', type: 'decisionNode', position: { x: 200, y: 160 }, data: { label: 'Found?', condition: 'canStart' } },
+  { id: 'create', type: 'stateNode', position: { x: 380, y: 160 }, data: { label: 'Create New Instance', status: 'success' } },
+  { id: 'load', type: 'stateNode', position: { x: 50, y: 160 }, data: { label: 'Load State', status: 'active' } },
+  { id: 'execute', type: 'stateNode', position: { x: 200, y: 270 }, data: { label: '3. Execute Handler', status: 'active' } },
+  { id: 'update', type: 'stateNode', position: { x: 200, y: 350 }, data: { label: '4. Update State', description: 'optimistic concurrency' } },
+  { id: 'publish', type: 'stateNode', position: { x: 200, y: 430 }, data: { label: '5. Publish Outgoing', status: 'active' } },
+  { id: 'ack', type: 'stateNode', position: { x: 200, y: 510 }, data: { label: '6. Acknowledge', status: 'success' } },
+];
+
+export const lifecycleEdges = [
+  { id: 'l1', source: 'receive', target: 'find', animated: true },
+  { id: 'l2', source: 'find', target: 'decision' },
+  { id: 'l3', source: 'decision', target: 'create', label: 'Not found + canStart', sourceHandle: 'right' },
+  { id: 'l4', source: 'decision', target: 'load', label: 'Found', sourceHandle: 'left' },
+  { id: 'l5', source: 'create', target: 'execute' },
+  { id: 'l6', source: 'load', target: 'execute' },
+  { id: 'l7', source: 'execute', target: 'update' },
+  { id: 'l8', source: 'update', target: 'publish' },
+  { id: 'l9', source: 'publish', target: 'ack', data: { type: 'success' } },
+];
+
+<FlowDiagram
+  nodes={lifecycleNodes}
+  edges={lifecycleEdges}
+  height={600}
+/>
 
 ## Optimistic Concurrency
 
