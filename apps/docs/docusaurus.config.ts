@@ -5,7 +5,7 @@ import type * as Preset from '@docusaurus/preset-classic';
 const config: Config = {
   title: 'Saga Bus',
   tagline: 'MassTransit-style saga orchestration for TypeScript/Node.js',
-  favicon: 'img/logo.svg',
+  favicon: 'img/logo.svg?v=2',
 
   future: {
     v4: true,
