@@ -59,8 +59,8 @@ representative at an online or offline event.
 ## Enforcement
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported to the community leaders responsible for enforcement at
-**dean@deanforan.com**.
+reported to the community leaders responsible for enforcement via
+[GitHub Issues](https://github.com/d-e-a-n-f/saga-bus/issues).
 
 All complaints will be reviewed and investigated promptly and fairly.
 

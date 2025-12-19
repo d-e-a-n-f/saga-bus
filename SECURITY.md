@@ -12,11 +12,9 @@ We release patches for security vulnerabilities in the following versions:
 
 We take the security of saga-bus seriously. If you believe you have found a security vulnerability, please report it to us as described below.
 
-**Please do not report security vulnerabilities through public GitHub issues.**
+Please report security vulnerabilities via [GitHub Security Advisories](https://github.com/d-e-a-n-f/saga-bus/security/advisories/new).
 
-Instead, please report them via email to **dean@deanforan.com**.
-
-You should receive a response within 48 hours. If for some reason you do not, please follow up via email to ensure we received your original message.
+You should receive a response within 48 hours.
 
 Please include the following information in your report:
 
