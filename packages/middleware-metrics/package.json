@@ -1,6 +1,6 @@
 {
   "name": "@saga-bus/middleware-metrics",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Prometheus metrics middleware for saga-bus",
   "type": "module",
   "main": "./dist/index.js",

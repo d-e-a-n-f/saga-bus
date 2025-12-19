@@ -1,6 +1,6 @@
 {
   "name": "@saga-bus/examples-shared",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Shared types, messages, and sagas for saga-bus examples",
   "type": "module",
   "main": "./dist/index.js",
