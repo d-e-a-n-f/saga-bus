@@ -57,24 +57,28 @@ A single message type can correlate by different fields:
 
 ## Correlation Flow
 
-```
-Message Received
-      │
-      ▼
-Extract Correlation ID
-(using correlate function)
-      │
-      ▼
-Query Store by Correlation ID
-      │
-      ├── Found ──► Load existing saga
-      │
-      └── Not Found
-            │
-            ├── canStart = true ──► Create new saga
-            │
-            └── canStart = false ──► Ignore message
-```
+export const correlationNodes = [
+  { id: 'crecv', type: 'stateNode', position: { x: 200, y: 0 }, data: { label: 'Message Received', status: 'initial' } },
+  { id: 'cextract', type: 'stateNode', position: { x: 200, y: 80 }, data: { label: 'Extract Correlation ID', description: 'using correlate function' } },
+  { id: 'cquery', type: 'stateNode', position: { x: 200, y: 160 }, data: { label: 'Query Store', status: 'active' } },
+  { id: 'cfound', type: 'decisionNode', position: { x: 200, y: 250 }, data: { label: 'Found?', condition: 'exists' } },
+  { id: 'cload', type: 'stateNode', position: { x: 50, y: 340 }, data: { label: 'Load existing saga', status: 'success' } },
+  { id: 'ccanstart', type: 'decisionNode', position: { x: 350, y: 340 }, data: { label: 'canStart?', condition: 'true' } },
+  { id: 'ccreate', type: 'stateNode', position: { x: 250, y: 440 }, data: { label: 'Create new saga', status: 'success' } },
+  { id: 'cignore', type: 'stateNode', position: { x: 450, y: 440 }, data: { label: 'Ignore message', status: 'warning' } },
+];
+
+export const correlationEdges = [
+  { id: 'ce1', source: 'crecv', target: 'cextract', animated: true },
+  { id: 'ce2', source: 'cextract', target: 'cquery' },
+  { id: 'ce3', source: 'cquery', target: 'cfound' },
+  { id: 'ce4', source: 'cfound', target: 'cload', label: 'Found', data: { type: 'success' } },
+  { id: 'ce5', source: 'cfound', target: 'ccanstart', label: 'Not Found' },
+  { id: 'ce6', source: 'ccanstart', target: 'ccreate', label: 'true', data: { type: 'success' } },
+  { id: 'ce7', source: 'ccanstart', target: 'cignore', label: 'false', data: { type: 'error' } },
+];
+
+<FlowDiagram nodes={correlationNodes} edges={correlationEdges} height={550} />
 
 ## Best Practices
 
