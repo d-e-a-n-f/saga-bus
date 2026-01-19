@@ -87,7 +87,7 @@ function getPublishablePackages() {
 async function publishPackage(pkg) {
   console.log(`\nPublishing ${pkg.name}@${pkg.version}...`);
   try {
-    execSync("npm publish --access public", {
+    execSync("pnpm publish --access public --no-git-checks", {
       cwd: pkg.path,
       stdio: "inherit",
     });
