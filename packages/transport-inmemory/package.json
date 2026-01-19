@@ -1,6 +1,6 @@
 {
   "name": "@saga-bus/transport-inmemory",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "In-memory transport for saga-bus testing and development",
   "type": "module",
   "main": "./dist/index.js",

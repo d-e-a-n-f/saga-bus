@@ -1,6 +1,6 @@
 {
   "name": "@saga-bus/store-inmemory",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "In-memory saga store for saga-bus testing and development",
   "type": "module",
   "main": "./dist/index.js",

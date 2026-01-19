@@ -1,6 +1,6 @@
 {
   "name": "@saga-bus/store-redis",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Redis saga store for saga-bus",
   "type": "module",
   "main": "./dist/index.cjs",

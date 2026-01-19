@@ -1,6 +1,6 @@
 {
   "name": "@saga-bus/transport-gcp-pubsub",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Google Cloud Pub/Sub transport for saga-bus",
   "type": "module",
   "main": "./dist/index.cjs",
