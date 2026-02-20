@@ -53,7 +53,7 @@
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "hono": "^4.6.0",
+    "hono": "^4.11.10",
     "tsup": "^8.0.0",
     "typescript": "^5.9.2",
     "vitest": "^3.0.0"
